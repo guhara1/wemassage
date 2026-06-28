@@ -20,14 +20,25 @@ import {
 import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
-  const citySlugs = ['suwon', 'seongnam', 'yongin', 'goyang', 'hwaseong', 'bucheon', 'ansan', 'anyang'];
+  // citySlug → 한국어 시 이름 매핑
+  const CITY_NAME: Record<string, string> = {
+    suwon: '수원',
+    seongnam: '성남',
+    yongin: '용인',
+    goyang: '고양',
+    hwaseong: '화성',
+    bucheon: '부천',
+    ansan: '안산',
+    anyang: '안양',
+  };
+  const citySlugs = Object.keys(CITY_NAME);
   const paths: { params: { district: string; gu: string }; props: { cityName: string; guName: string } }[] = [];
   for (const city of citySlugs) {
     const gus = getGuDistricts(city);
     for (const gu of gus) {
       paths.push({
         params: { district: city, gu: gu.slug },
-        props: { cityName: gu.name.replace(/구$/, ''), guName: gu.name },
+        props: { cityName: CITY_NAME[city], guName: gu.name },
       });
     }
   }
