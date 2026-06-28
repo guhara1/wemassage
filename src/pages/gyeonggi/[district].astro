@@ -107,10 +107,10 @@ const dongs = getDongList('gyeonggi', district.slug);
     {isSpecialCity && guDistricts.length > 0 && (
       <section class="section-sm" style="border-top: 1px solid var(--color-border);">
         <h2 class="section-title">{dName} <span class="accent">일반구</span></h2>
-        <p class="section-subtitle">{dName}의 행정구(일반구)별로 안내합니다.</p>
+        <p class="section-subtitle">{dName}의 행정구(일반구)를 클릭하면 행정동별 방문 가능 지역을 확인할 수 있습니다.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           {guDistricts.map((gu) => (
-            <span class="tag tag-accent" style="padding: 11px 18px; font-size: 0.92rem;">{gu.name}</span>
+            <a href={`/gyeonggi/${district.slug}/${gu.slug}/`} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">{gu.name}</a>
           ))}
         </div>
       </section>
@@ -133,7 +133,7 @@ const dongs = getDongList('gyeonggi', district.slug);
         <h2 class="section-title">{dName} <span class="accent">주요 지하철역</span></h2>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           {district.nearbyStationsData.map((s) => (
-            <span class="tag tag-accent" style="padding: 11px 18px; font-size: 0.92rem;">{stationLabel(s)}</span>
+            <a href="/station/" class="tag tag-accent" style="padding: 11px 18px; font-size: 0.92rem;">{stationLabel(s)}</a>
           ))}
         </div>
       </section>

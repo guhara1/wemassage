@@ -115,7 +115,7 @@ const dongs = getDongList('seoul', district.slug);
         <h2 class="section-title">{dName} <span class="accent">주요 지하철역</span></h2>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           {district.nearbyStationsData.map((s) => (
-            <span class="tag tag-accent" style="padding: 11px 18px; font-size: 0.92rem;">{stationLabel(s)}</span>
+            <a href="/station/" class="tag tag-accent" style="padding: 11px 18px; font-size: 0.92rem;">{stationLabel(s)}</a>
           ))}
         </div>
       </section>
