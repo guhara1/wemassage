@@ -1,12 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0e1a"/>
+      <stop offset="1" stop-color="#161d2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#ffb347"/>
       <stop offset="0.5" stop-color="#ff7a18"/>
       <stop offset="1" stop-color="#e85d04"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#0a0e1a"/>
-  <rect x="6" y="6" width="52" height="52" rx="11" fill="url(#g)"/>
-  <text x="32" y="42" font-family="Arial, sans-serif" font-size="26" font-weight="900" fill="#0a0e1a" text-anchor="middle">WE</text>
+  <!-- 배경 (딥 다크, 라운드) -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- 오렌지 테두리 링 -->
+  <rect x="4" y="4" width="56" height="56" rx="11" fill="none" stroke="url(#accent)" stroke-width="1.5" opacity="0.5"/>
+  <!-- WE 뱃지 (오렌지 그라데이션) -->
+  <rect x="11" y="18" width="42" height="28" rx="7" fill="url(#accent)"/>
+  <!-- WE 텍스트 (딥 다큁 배경색) -->
+  <text x="32" y="38" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="900" fill="#0a0e1a" text-anchor="middle" letter-spacing="0.5">WE</text>
 </svg>
