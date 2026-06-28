@@ -1,0 +1,71 @@
+---
+/**
+ * 사이트 소개 (/about/)
+ * E-E-A-T — 사이트 운영 목적, 운영 기준 공개
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { siteConfig } from '../data/site';
+import { breadcrumbSchema, webPageSchema, organizationSchema } from '../lib/schema';
+
+const path = '/about/';
+const title = '사이트 소개｜수도권 출장마사지 방문 가능 지역 안내';
+const description =
+  'WE 마사지는 서울·경기·인천 수도권 출장마사지 방문 가능 지역과 예약 전 확인사항을 안내하는 정보 사이트입니다. 운영 목적과 품질 기준을 공개합니다.';
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '사이트 소개', url: '/about/' },
+];
+
+const schemas = [
+  organizationSchema(),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container container-narrow">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 24px 0 32px;">
+      <h1 style="font-size: 2rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;">사이트 소개</h1>
+      <p style="color: var(--color-text-soft); font-size: 1.05rem;">{siteConfig.organization.description}</p>
+    </section>
+
+    <section class="section-sm">
+      <div class="prose">
+        <h2>운영 목적</h2>
+        <p>
+          {siteConfig.name}은 합법적인 방문형 건강 관리(스포츠 마사지, 체형 관리 등) 정보 안내 목적으로 운영됩니다.
+          서울·경기·인천 수도권 전 지역을 행정구역, 생활권, 지하철역, 이용 장소 4가지 기준으로 안내하여
+          이용자가 방문 가능 지역과 예약 전 확인사항을 빠르게 찾을 수 있도록 돕습니다.
+        </p>
+        <h2>운영 기준</h2>
+        <ul>
+          <li>지역명만 바꾼 얇은 페이지를 만들지 않습니다.</li>
+          <li>출구별·환승역 노선별·번호동별 대량 페이지는 만들지 않습니다.</li>
+          <li>본문이 부족한 행정동이나 검색 수요가 낮은 세부 지역은 색인에서 제외합니다.</li>
+          <li>지자체·대중교통 운영사 등 공식 출처를 참고 자료로 표시합니다.</li>
+          <li>모든 주요 페이지에 예약 전 확인사항과 개인정보 처리 기준을 포함합니다.</li>
+        </ul>
+        <h2>제공하지 않는 것</h2>
+        <p>
+          불법 행위 및 선정적 서비스는 일절 제공하지 않으며 관련 문의도 받지 않습니다.
+          허위 후기·가짜 평점·과장된 할인 문구도 사용하지 않습니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <div class="callout callout-info">
+        <div class="callout__title">연락처</div>
+        상호: {siteConfig.name}<br />
+        전화예약: <a href={`tel:${siteConfig.phoneTel}`}>{siteConfig.phoneDisplay}</a><br />
+        웹사이트 제작·제휴 문의: <a href={siteConfig.telegramUrl} target="_blank" rel="noopener noreferrer">텔레그램</a>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

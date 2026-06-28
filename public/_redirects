@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects
+# 인천 2026.7.1 행정구역 개편 대응 (개편 후 활성화)
+# /incheon/jung-gu/*  /incheon/jemulpo-gu/:splat  301
+# /incheon/dong-gu/*  /incheon/jemulpo-gu/:splat  301
+# /incheon/seo-gu/*   /incheon/seohae-gu/:splat   301

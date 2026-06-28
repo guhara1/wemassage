@@ -1,0 +1,27 @@
+{
+  "name": "we-massage",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "WE 마사지 - 서울·경기·인천 수도권 매트릭스형 출장마사지 방문 가능 지역 안내 사이트",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "engines": {
+    "node": ">=18.14.1"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.2.1",
+    "astro": "^4.16.18"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.2"
+  },
+  "allowScripts": {
+    "sharp@0.33.5": true,
+    "sharp@0.35.2": true
+  }
+}

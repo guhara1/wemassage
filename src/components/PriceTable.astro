@@ -1,0 +1,40 @@
+---
+/**
+ * 가격표 컴포넌트
+ * 데이터: src/data/common/price-table.json
+ */
+import { getPriceTable } from '../lib/data';
+
+interface Props {
+  title?: string;
+}
+const { title = '출장마사지 가격표' } = Astro.props;
+const price = getPriceTable();
+---
+
+<div class="price-table">
+  <div class="price-table__title">{title}</div>
+  {price.courses.map((course) => (
+    <div class="price-table__row">
+      <div class="price-table__name">
+        {course.name}
+        {course.desc && <small>{course.desc}</small>}
+      </div>
+      <div class="price-table__price">{course.price}</div>
+    </div>
+  ))}
+  {price.additionalFees && price.additionalFees.length > 0 && (
+    <>
+      {price.additionalFees.map((fee) => (
+        <div class="price-table__row">
+          <div class="price-table__name">
+            {fee.name}
+            {fee.desc && <small>{fee.desc}</small>}
+          </div>
+          <div class="price-table__price">{fee.price}</div>
+        </div>
+      ))}
+    </>
+  )}
+  <div class="price-table__note">{price.note}</div>
+</div>

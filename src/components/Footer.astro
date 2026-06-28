@@ -1,0 +1,103 @@
+---
+/**
+ * 사이트 푸터 - 상호, 전화예약, 텔레그램 문의 CTA, 운영 기준, 법적 안내
+ */
+import { siteConfig } from '../data/site';
+const year = new Date().getFullYear();
+const telegramUrl = siteConfig.telegramUrl ?? '#';
+---
+
+<footer class="site-footer">
+  <div class="container">
+    {/* 텔레그램 문의 CTA (오렌지 버튼 2종) */}
+    {siteConfig.telegramUrl && (
+      <div class="footer-cta">
+        <div class="footer-cta__text">
+          <div class="footer-cta__title">문의하기</div>
+          <div class="footer-cta__desc">
+            웹사이트 제작·제휴 문의는 텔레그램으로 빠르게 안내받으세요.
+          </div>
+        </div>
+        <div class="footer-cta__buttons">
+          <a href={telegramUrl} class="btn btn-telegram" target="_blank" rel="noopener noreferrer">
+            ✈ 웹사이트 제작문의
+          </a>
+          <a href={telegramUrl} class="btn btn-telegram" target="_blank" rel="noopener noreferrer">
+            🤝 제휴문의
+          </a>
+        </div>
+      </div>
+    )}
+
+    <div class="site-footer__grid">
+      <div>
+        <div class="site-footer__logo">
+          <span class="accent-text">WE</span> 마사지
+        </div>
+        <p class="site-footer__desc">
+          서울·경기·인천 수도권 출장마사지·홈타이 방문 가능 지역과 예약 전 확인사항을 안내합니다.
+          행정구역·생활권·역세권·이용 장소 4가지 기준으로 확인하세요.
+        </p>
+        {siteConfig.phoneTel && (
+          <a href={`tel:${siteConfig.phoneTel}`} class="site-footer__phone">
+            📞 {siteConfig.phoneDisplay}
+          </a>
+        )}
+      </div>
+      <div>
+        <div class="site-footer__title">지역 안내</div>
+        <div class="site-footer__links">
+          <a href="/seoul/">서울</a>
+          <a href="/gyeonggi/">경기</a>
+          <a href="/incheon/">인천</a>
+          <a href="/life/">수도권 생활권</a>
+          <a href="/station/">지하철역</a>
+        </div>
+      </div>
+      <div>
+        <div class="site-footer__title">이용 안내</div>
+        <div class="site-footer__links">
+          <a href="/check/">예약 전 확인</a>
+          <a href="/use/">이용 장소별 안내</a>
+          <a href="/use/home/">자택 이용</a>
+          <a href="/use/hotel/">호텔 이용</a>
+          <a href="/use/night/">야간 예약</a>
+        </div>
+      </div>
+      <div>
+        <div class="site-footer__title">운영 기준</div>
+        <div class="site-footer__links">
+          <a href="/about/">사이트 소개</a>
+          <a href="/contact/">고객센터</a>
+          <a href="/privacy/">개인정보 처리방침</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__legal">
+      <strong>※ 서비스 운영 안내</strong><br />
+      상호: {siteConfig.name} ｜ 전화예약: {siteConfig.phoneDisplay}<br />
+      본 사이트는 합법적인 방문형 건강 관리(스포츠 마사지, 체형 관리 등) 정보 안내 목적으로 운영됩니다.
+      불법 행위 및 선정적 서비스는 일절 제공하지 않으며, 관련 문의는 받지 않습니다.
+      허위 후기·가짜 평점·과장된 할인 문구는 사용하지 않습니다.
+    </div>
+
+    <div class="site-footer__bottom">
+      © {year} {siteConfig.name}. 모든 권리 보유.
+    </div>
+  </div>
+</footer>
+
+{/* 모바일 고정 전화 CTA 바 */}
+{siteConfig.phoneTel && (
+  <div class="mobile-call-bar">
+    <div class="mobile-call-bar__inner">
+      <div class="mobile-call-bar__label">
+        전화예약<br /><strong>{siteConfig.phoneDisplay}</strong>
+      </div>
+      <a href={`tel:${siteConfig.phoneTel}`} class="btn btn-phone">
+        📞 지금 전화하기
+      </a>
+    </div>
+  </div>
+)}

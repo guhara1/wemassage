@@ -1,0 +1,30 @@
+---
+/**
+ * 사이트 헤더 / 네비게이션
+ * 상호: WE 마사지, 전화예약 버튼 포함
+ * 스펙 4절 메뉴 구성 (메뉴명에 "출장마사지" 반복 금지)
+ */
+import { siteConfig } from '../data/site';
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="site-header__logo" aria-label={`${siteConfig.name} 홈`}>
+      <span class="badge-we">WE</span>
+      <span><span class="accent-text">마사지</span></span>
+    </a>
+    <nav class="site-nav" aria-label="주요 메뉴">
+      <a href="/seoul/">서울</a>
+      <a href="/gyeonggi/">경기</a>
+      <a href="/incheon/">인천</a>
+      <a href="/life/">생활권</a>
+      <a href="/station/">지하철역</a>
+      <a href="/check/">예약 전 확인</a>
+      {siteConfig.phoneTel && (
+        <a href={`tel:${siteConfig.phoneTel}`} class="btn btn-phone btn-sm">
+          📞 {siteConfig.phoneDisplay}
+        </a>
+      )}
+    </nav>
+  </div>
+</header>

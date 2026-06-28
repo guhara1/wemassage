@@ -1,0 +1,105 @@
+---
+/**
+ * 생활권 보기 허브 (/life/)
+ * 스펙 8절 - 수도권 핵심 생활권 통합 허브
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getReadyLifeAreas } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+
+const path = '/life/';
+const title = '수도권 출장마사지 생활권 보기｜업무지구·신도시·역세권·주거';
+const description =
+  '서울·경기·인천 핵심 생활권별 출장마사지 방문 가능 지역. 강남역·역삼, 분당·판교, 송도국제도시 등 실제 이용자가 부르는 생활권 기준입니다.';
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '생활권 보기', url: '/life/' },
+];
+
+const schemas = [
+  organizationSchema(),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+];
+
+const seoulAreas = getReadyLifeAreas('seoul');
+const gyeonggiAreas = getReadyLifeAreas('gyeonggi');
+const incheonAreas = getReadyLifeAreas('incheon');
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 32px 0 40px;">
+      <div class="tag tag-accent" style="margin-bottom: 16px;">생활권 보기 · 수도권 매트릭스</div>
+      <h1 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 16px;">
+        수도권 <span class="accent-text">생활권별</span> 방문 가능 지역
+      </h1>
+      <p style="font-size: 1.05rem; color: var(--color-text-soft); max-width: 680px; line-height: 1.7;">
+        행정구역이 아닌 실제 생활권 단위로 방문 환경을 확인하세요. 같은 구 안에서도 업무지구·신도시·역세권·주거지는
+        방문 기준이 다릅니다. 강남역·역삼, 분당·판교, 송도국제도시처럼 실제 이용자가 부르는 기준입니다.
+      </p>
+    </section>
+
+    {seoulAreas.length > 0 && (
+      <section class="section" style="border-top: 1px solid var(--color-border); padding-top: 48px;">
+        <h2 class="section-title">서울 <span class="accent">생활권</span></h2>
+        <div class="card-grid">
+          {seoulAreas.map((area) => (
+            <a href={`/seoul/life/${area.slug}/`} class="card">
+              <div class="tag tag-accent" style="margin-bottom: 12px; display: inline-block;">서울 생활권</div>
+              <h3 class="card__title">{area.name}</h3>
+              <p class="card__desc">{area.description}</p>
+              <span class="card__link">상세보기 →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {gyeonggiAreas.length > 0 && (
+      <section class="section" style="border-top: 1px solid var(--color-border);">
+        <h2 class="section-title">경기 <span class="accent">생활권</span></h2>
+        <div class="card-grid">
+          {gyeonggiAreas.map((area) => (
+            <a href={`/gyeonggi/life/${area.slug}/`} class="card">
+              <div class="tag tag-accent" style="margin-bottom: 12px; display: inline-block;">경기 생활권</div>
+              <h3 class="card__title">{area.name}</h3>
+              <p class="card__desc">{area.description}</p>
+              <span class="card__link">상세보기 →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {incheonAreas.length > 0 && (
+      <section class="section" style="border-top: 1px solid var(--color-border);">
+        <h2 class="section-title">인천 <span class="accent">생활권</span></h2>
+        <div class="card-grid">
+          {incheonAreas.map((area) => (
+            <a href={`/incheon/life/${area.slug}/`} class="card">
+              <div class="tag tag-accent" style="margin-bottom: 12px; display: inline-block;">인천 생활권</div>
+              <h3 class="card__title">{area.name}</h3>
+              <p class="card__desc">{area.description}</p>
+              <span class="card__link">상세보기 →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">다른 기준으로 <span class="accent">찾기</span></h2>
+      <div class="card-grid">
+        <a href="/area/" class="card"><h3 class="card__title">지역별 보기</h3><p class="card__desc">행정구역(구·시군) 기준.</p></a>
+        <a href="/station/" class="card"><h3 class="card__title">지하철역 보기</h3><p class="card__desc">역세권 기준.</p></a>
+        <a href="/use/" class="card"><h3 class="card__title">이용 장소 보기</h3><p class="card__desc">자택·호텔·오피스텔·외곽.</p></a>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

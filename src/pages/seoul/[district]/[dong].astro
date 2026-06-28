@@ -1,0 +1,134 @@
+---
+/**
+ * 서울 행정동 상세 페이지 (동적)
+ * /seoul/[district]/[dong]/
+ * 번호동(1동·2동 등)은 대표동으로 통합한 슬러그 기준.
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Checklist from '../../../components/Checklist.astro';
+import PriceTable from '../../../components/PriceTable.astro';
+import PhoneCTA from '../../../components/PhoneCTA.astro';
+import FAQ from '../../../components/FAQ.astro';
+import {
+  getDistrict,
+  getDongList,
+  getAllUseCases,
+  postposition,
+} from '../../../lib/data';
+import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+
+export const getStaticPaths = (() => {
+  const districts = ['gangnam-gu','seocho-gu','songpa-gu','gangdong-gu','mapo-gu','seodaemun-gu','eunpyeong-gu','yeongdeungpo-gu','guro-gu','geumcheon-gu','gangseo-gu','yangcheon-gu','gwanak-gu','dongjak-gu','seongdong-gu','gwangjin-gu','dongdaemun-gu','jungnang-gu','nowon-gu','dobong-gu','gangbuk-gu','seongbuk-gu','jongno-gu','jung-gu','yongsan-gu'];
+  const paths: { params: { district: string; dong: string }; props: { districtName: string; dongName: string } }[] = [];
+  for (const d of districts) {
+    const district = getDistrict('seoul', d);
+    if (!district) continue;
+    const dongs = getDongList('seoul', d);
+    for (const dong of dongs) {
+      paths.push({
+        params: { district: d, dong: dong.slug },
+        props: { districtName: district.name, dongName: dong.name },
+      });
+    }
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props { districtName: string; dongName: string; }
+const { districtName, dongName } = Astro.props;
+const { district, dong } = Astro.params;
+
+const path = `/seoul/${district}/${dong}/`;
+const dongPP = postposition(dongName, '은는');
+const title = `서울 ${districtName} ${dongName} 출장마사지｜방문 가능 지역 및 예약 전 확인`;
+const description = `서울 ${districtName} ${dongName} 출장마사지. ${dongName} 주변 방문 가능 지역과 예약 전 확인사항, 이용 장소별 기준을 안내합니다.`;
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '서울', url: '/seoul/' },
+  { name: districtName, url: `/seoul/${district}/` },
+  { name: dongName, url: path },
+];
+
+const useCases = getAllUseCases();
+
+const faqs = [
+  {
+    question: `${districtName} ${dongName}에서 방문 가능한가요?`,
+    answer: `네, ${dongName} 방문이 가능합니다. 예약 시 정확한 도로명주소(건물명·동·호수)를 안내해 주세요. 공동현관 출입 방식도 함께 알려주시면 원활합니다.`,
+  },
+  {
+    question: `${dongName} 호텔·오피스텔도 가능한가요?`,
+    answer: `가능합니다. 단, 오피스텔은 관리사무소 출입 통제가, 호텔은 외부인 출입 정책이 있을 수 있어 예약 시 건물명·출입 방식을 알려주시면 확인해 드립니다.`,
+  },
+];
+
+const schemas = [
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  faqPageSchema(faqs),
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container container-narrow">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 24px 0 32px;">
+      <div class="tag tag-accent" style="margin-bottom: 14px;">서울 · 행정동</div>
+      <h1 style="font-size: 2rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;">
+        {districtName} {dongName} 출장마사지
+      </h1>
+      <p style="color: var(--color-text-soft); font-size: 1.05rem;">
+        서울 {districtName} {dongName} 중심의 방문 가능 지역 안내입니다. {dongPP} 서울 동부·서부 어느 지역보다
+        실제 주소 기준 방문 환경을 확인하기 좋습니다. 예약 전 아래 확인사항을 점검해 주세요.
+      </p>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">{dongName} <span class="accent">예약 전 확인사항</span></h2>
+      <div class="prose">
+        <p>
+          {dongName}은 {districtName}에 속한 행정동으로, 아파트·빌라·오피스텔·상가가 혼재된 지역입니다.
+          가장 먼저 확인할 것은 <strong>건물 출입 방식</strong>입니다. 공동현관 비밀번호·도어폰·경비실 출입 절차가 있다면
+          예약 시 미리 알려주시면 원활한 방문에 도움이 됩니다.
+        </p>
+        <p>
+          {dongName}의 경우 자택·오피스텔 이용이 주를 이룹니다. 호텔 이용은 숙소별 출입 정책이 다르므로
+          숙소명을 예약 시 알려주시면 확인 후 방문합니다. 주차 공간이 있다면 함께 안내해 주세요.
+        </p>
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">이용 장소에 따라 <span class="accent">확인할 내용</span></h2>
+      <div class="card-grid">
+        {useCases.map((uc) => (
+          <a href={`/use/${uc.slug}/`} class="card">
+            <h3 class="card__title">{uc.label}</h3>
+            <p class="card__desc">{uc.summary}</p>
+            <span class="card__link">확인하기 →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <Checklist />
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <PriceTable title={`${districtName} ${dongName} 출장마사지 가격표`} />
+    </section>
+
+    <PhoneCTA region={`서울 ${districtName} ${dongName}`} />
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>
+      <FAQ faqs={faqs} />
+    </section>
+
+  </div>
+</BaseLayout>

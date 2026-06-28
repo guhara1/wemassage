@@ -1,0 +1,95 @@
+---
+/**
+ * 지하철역 보기 허브 (/station/)
+ * 스펙 12절 - 수도권 역세권 안내 (역명 기준 1개 URL)
+ * 출구별·환승역 노선별 페이지는 만들지 않는다.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ExternalSources from '../../components/ExternalSources.astro';
+import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+
+const path = '/station/';
+const title = '수도권 출장마사지 지하철역 보기｜강남역·수원역·부평역 역세권';
+const description =
+  '서울·경기·인천 핵심 역세권 출장마사지 안내. 강남역·홍대입구·잠실·수원역·부평역·송도 등 역 기준으로 가까운 방문 가능 지역을 확인하세요.';
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '지하철역 보기', url: '/station/' },
+];
+
+const schemas = [
+  organizationSchema(),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+];
+
+// 핵심 역세권 생활권 안내 (대표 역 중심)
+const keyStations = [
+  { name: '강남역·역삼', href: '/seoul/life/gangnam-yeoksam/', region: '서울', lines: '2호선·신분당선' },
+  { name: '잠실·송파', href: '/seoul/life/jamsil-songpa/', region: '서울', lines: '2호선·8호선' },
+  { name: '홍대·합정', href: '/seoul/life/hongdae-hapjeong/', region: '서울', lines: '2호선·공항철도' },
+  { name: '여의도·영등포', href: '/seoul/life/yeouido-yeongdeungpo/', region: '서울', lines: '5호선·9호선' },
+  { name: '성수·왕십리', href: '/seoul/life/seongsu-wangsimni/', region: '서울', lines: '2호선·분당선' },
+  { name: '용산·서울역', href: '/seoul/life/yongsan-seoul-station/', region: '서울', lines: '1호선·4호선·KTX' },
+  { name: '수원역·인계동', href: '/gyeonggi/life/suwon-station-ingye/', region: '경기', lines: '1호선·분당선' },
+  { name: '분당·판교', href: '/gyeonggi/life/bundang-pangyo/', region: '경기', lines: '분당선·신분당선' },
+  { name: '동탄신도시', href: '/gyeonggi/life/dongtan-newtown/', region: '경기', lines: 'SRT 동탄역' },
+  { name: '부천역·상동', href: '/gyeonggi/life/bucheon-station-sangdong/', region: '경기', lines: '1호선·7호선' },
+  { name: '송도국제도시', href: '/incheon/life/songdo-international-city/', region: '인천', lines: '인천1호선' },
+  { name: '부평역·부평시장', href: '/incheon/life/bupyeong-station-market/', region: '인천', lines: '1호선·인천1호선' },
+  { name: '구월·인천시청', href: '/incheon/life/guwol-incheon-cityhall/', region: '인천', lines: '인천1호선' },
+  { name: '영종·운서', href: '/incheon/life/yeongjong-unseo/', region: '인천', lines: '공항철도' },
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 32px 0 40px;">
+      <div class="tag tag-accent" style="margin-bottom: 16px;">지하철역 보기 · 수도권 역세권</div>
+      <h1 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 16px;">
+        수도권 <span class="accent-text">역세권별</span> 방문 가능 지역
+      </h1>
+      <p style="font-size: 1.05rem; color: var(--color-text-soft); max-width: 680px; line-height: 1.7;">
+        지하철역 기준으로 가까운 방문 가능 지역을 확인하세요. 역세권은 대중교통 접근성이 좋아 이동이 빠르지만,
+        주차 공간이 부족하고 건물 출입 통제가 엄격한 경우가 많습니다.
+      </p>
+      <div class="callout callout-info" style="margin-top: 24px;">
+        <div class="callout__title">역세권 페이지 운영 기준</div>
+        역명 기준 1개 URL만 안내합니다. 환승역도 노선별로 나누지 않고, 출구별 페이지는 만들지 않습니다.
+        예정역·미개통역은 단독 색인하지 않습니다.
+      </div>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border); padding-top: 48px;">
+      <h2 class="section-title">핵심 <span class="accent">역세권</span></h2>
+      <p class="section-subtitle">역세권 주변 생활권 페이지로 이동합니다.</p>
+      <div class="card-grid">
+        {keyStations.map((s) => (
+          <a href={s.href} class="card">
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+              <span class="tag tag-accent">{s.region}</span>
+              <span class="tag">{s.lines}</span>
+            </div>
+            <h3 class="card__title">{s.name}</h3>
+            <span class="card__link">방문 가능 지역 보기 →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">대중교통 <span class="accent">공식 정보</span></h2>
+      <ExternalSources links={[
+        { label: '서울교통공사', url: 'https://www.seoulmetro.co.kr', desc: '서울 지하철' },
+        { label: '코레일', url: 'https://www.letskorail.com', desc: '국철·KTX' },
+        { label: '인천교통공사', url: 'https://www.icros.or.kr', desc: '인천 지하철' },
+        { label: '인천공항철도', url: 'https://www.arex.or.kr', desc: '공항철도' },
+      ]} />
+    </section>
+
+  </div>
+</BaseLayout>

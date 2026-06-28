@@ -1,0 +1,136 @@
+---
+/**
+ * 인천 행정동·읍면 상세 페이지 (동적)
+ * /incheon/[district]/[dong]/
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Checklist from '../../../components/Checklist.astro';
+import PriceTable from '../../../components/PriceTable.astro';
+import PhoneCTA from '../../../components/PhoneCTA.astro';
+import FAQ from '../../../components/FAQ.astro';
+import {
+  getDistricts,
+  getDongList,
+  getAllUseCases,
+  postposition,
+} from '../../../lib/data';
+import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+
+export const getStaticPaths = (() => {
+  const incheon = getDistricts('incheon');
+  const paths: { params: { district: string; dong: string }; props: { districtName: string; dongName: string } }[] = [];
+  for (const d of incheon) {
+    const dongs = getDongList('incheon', d.slug);
+    for (const dong of dongs) {
+      paths.push({
+        params: { district: d.slug, dong: dong.slug },
+        props: { districtName: d.name, dongName: dong.name },
+      });
+    }
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props { districtName: string; dongName: string; }
+const { districtName, dongName } = Astro.props;
+const { district, dong } = Astro.params;
+
+const path = `/incheon/${district}/${dong}/`;
+const dongPP = postposition(dongName, '은는');
+const isIsland = ['ganghwa-gun', 'ongjin-gun'].includes(district!);
+const title = `인천 ${districtName} ${dongName} 출장마사지｜방문 가능 지역 및 예약 전 확인`;
+const description = `인천 ${districtName} ${dongName} 출장마사지. ${dongName} 주변 방문 가능 지역과 예약 전 확인사항을 안내합니다.`;
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '인천', url: '/incheon/' },
+  { name: districtName, url: `/incheon/${district}/` },
+  { name: dongName, url: path },
+];
+
+const useCases = getAllUseCases();
+
+const faqs = [
+  {
+    question: `${districtName} ${dongName}에서 방문 가능한가요?`,
+    answer: isIsland
+      ? `${dongName}은 도서 특성상 사전 예약과 추가 이동비가 필요하며, 기상·교통편에 따라 일정 조정이 있을 수 있습니다.`
+      : `네, ${dongName} 방문이 가능합니다. 예약 시 정확한 도로명주소와 출입 방식을 알려주시면 원활합니다.`,
+  },
+];
+
+const schemas = [
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  faqPageSchema(faqs),
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container container-narrow">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 24px 0 32px;">
+      <div class="tag tag-accent" style="margin-bottom: 14px;">인천 · 행정동·읍면</div>
+      <h1 style="font-size: 2rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;">
+        {districtName} {dongName} 출장마사지
+      </h1>
+      <p style="color: var(--color-text-soft); font-size: 1.05rem;">
+        인천 {districtName} {dongName} 중심의 방문 가능 지역 안내입니다. {dongPP} 자택·아파트·오피스텔 중심 생활권으로,
+        예약 전 아래 확인사항을 점검해 주세요.
+      </p>
+    </section>
+
+    {isIsland && (
+      <div class="callout callout-warning" style="margin-bottom: 32px;">
+        <div class="callout__title">도서 지역 예약 안내</div>
+        {dongName}은 도서 지역 특성상 <strong>사전 예약과 추가 이동비</strong>가 필요하며,
+        기상·여객선 편에 따라 일정 조정이 있을 수 있습니다.
+      </div>
+    )}
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <div class="prose">
+        <p>
+          {dongName}은 인천 {districtName}에 속한 행정동·읍면입니다. <strong>건물 출입 방식</strong>을 먼저 확인해 주세요.
+          공동현관 비밀번호·도어폰·경비실 출입 절차가 있다면 예약 시 미리 알려주시면 원활한 방문에 도움이 됩니다.
+        </p>
+        <p>
+          송도·청라 등 신도시는 공동현관 출입 통제가 엄격하고, 원도심(부평·주안 등)은 상가 밀집으로
+          주차가 제한될 수 있습니다. 예약 시 주차 가능 여부도 함께 알려주세요.
+        </p>
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">이용 장소에 따라 <span class="accent">확인할 내용</span></h2>
+      <div class="card-grid">
+        {useCases.map((uc) => (
+          <a href={`/use/${uc.slug}/`} class="card">
+            <h3 class="card__title">{uc.label}</h3>
+            <p class="card__desc">{uc.summary}</p>
+            <span class="card__link">확인하기 →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <Checklist />
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <PriceTable title={`${districtName} ${dongName} 출장마사지 가격표`} />
+    </section>
+
+    <PhoneCTA region={`인천 ${districtName} ${dongName}`} />
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>
+      <FAQ faqs={faqs} />
+    </section>
+
+  </div>
+</BaseLayout>

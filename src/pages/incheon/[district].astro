@@ -1,0 +1,175 @@
+---
+/**
+ * 인천 구·군 상세 페이지 (동적)
+ * /incheon/[district]/
+ * 2026.7.1 개편체제(9구 2군) 기준. 동구는 noindex(제물포구로 통합).
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Checklist from '../../components/Checklist.astro';
+import PriceTable from '../../components/PriceTable.astro';
+import PhoneCTA from '../../components/PhoneCTA.astro';
+import FAQ from '../../components/FAQ.astro';
+import ExternalSources from '../../components/ExternalSources.astro';
+import {
+  getDistricts,
+  findLifeAreaBySlug,
+  getAllUseCases,
+  getDongList,
+  stationLabel,
+} from '../../lib/data';
+import type { DistrictData } from '../../lib/types';
+import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../lib/schema';
+
+export const getStaticPaths = (() => {
+  return getDistricts('incheon').map((d) => ({
+    params: { district: d.slug },
+    props: { district: d },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props { district: DistrictData; }
+const { district } = Astro.props;
+const path = district.canonicalUrl;
+const dName = district.name;
+const isReformedNew = ['jemulpo-gu', 'yeongjong-gu', 'geomdan-gu', 'seohae-gu'].includes(district.slug);
+const isIsland = ['ganghwa-gun', 'ongjin-gun'].includes(district.slug);
+
+const title = `인천 ${dName} 출장마사지｜생활권·행정동·역세권 방문 가능 지역 안내`;
+const description = `인천 ${dName} 출장마사지 예약 전 생활권별 방문 가능 지역과 행정동, 역세권, 이용 장소별 확인사항을 안내합니다. ${district.description}`;
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '인천', url: '/incheon/' },
+  { name: dName, url: path },
+];
+
+const useCases = getAllUseCases();
+const relatedAreas = (district.representativeLifeAreas ?? [])
+  .map((slug) => findLifeAreaBySlug(slug))
+  .filter(Boolean);
+
+const faqs = [
+  {
+    question: `${dName} 어디까지 방문 가능한가요?`,
+    answer: isIsland
+      ? `${dName}은 도서 지역 특성상 사전 예약과 추가 이동비가 필요하며, 기상·교통편에 따라 일정 조정이 있을 수 있습니다.`
+      : `${dName} 전역 방문이 가능합니다. 단, 호텔·오피스텔은 관리 규정에 따라 출입이 제한될 수 있습니다.`,
+  },
+  {
+    question: `${dName} 추가 이동비는 어떻게 되나요?`,
+    answer: isIsland
+      ? `${dName}은 도서 특성으로 추가 이동비가 발생하며, 도서별 접근성에 따라 상이합니다. 예약 시 안내해 드립니다.`
+      : `인천 ${dName} 기본 출장 이동비는 4만원이며, 심야·외곽은 추가 이동비가 발생할 수 있습니다.`,
+  },
+];
+
+const schemas = [
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  faqPageSchema(faqs),
+];
+
+const dongs = getDongList('incheon', district.slug);
+---
+
+<BaseLayout title={title} description={description} path={path} noindex={district.noindex} schemas={schemas}>
+  <div class="container container-narrow">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 24px 0 32px;">
+      <div class="tag tag-accent" style="margin-bottom: 14px;">인천 · {district.contentFocus}</div>
+      <h1 style="font-size: 2rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;">
+        {dName} 출장마사지 · 방문 가능 지역
+      </h1>
+      <p style="color: var(--color-text-soft); font-size: 1.05rem;">{district.description}</p>
+    </section>
+
+    {isReformedNew && (
+      <div class="callout callout-info" style="margin-bottom: 32px;">
+        <div class="callout__title">2026.7.1 인천 행정구역 개편 반영</div>
+        {dName}은 2026년 7월 1일 시행된 인천 행정구역 개편(9구 2군 체제)을 반영한 페이지입니다.
+      </div>
+    )}
+
+    {isIsland && (
+      <div class="callout callout-warning" style="margin-bottom: 32px;">
+        <div class="callout__title">도서 지역 예약 안내</div>
+        {dName}은 도서 지역 특성상 <strong>사전 예약과 추가 이동비</strong>가 필요하며,
+        기상·여객선 편에 따라 일정 조정이 있을 수 있습니다.
+      </div>
+    )}
+
+    {relatedAreas.length > 0 && (
+      <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+        <h2 class="section-title">{dName} 주요 <span class="accent">생활권 안내</span></h2>
+        <div class="card-grid">
+          {relatedAreas.map((area) => area && (
+            <a href={`/incheon/life/${area.slug}/`} class="card">
+              <div class="tag tag-accent" style="margin-bottom: 10px; display: inline-block;">생활권</div>
+              <h3 class="card__title">{area.name}</h3>
+              <p class="card__desc">{area.description}</p>
+              <span class="card__link">상세보기 →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {dongs.length > 0 && (
+      <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+        <h2 class="section-title">{dName} <span class="accent">행정동·읍면</span></h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          {dongs.map((dong) => (
+            <span class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">{dong.name}</span>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {district.nearbyStationsData && district.nearbyStationsData.length > 0 && (
+      <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+        <h2 class="section-title">{dName} <span class="accent">주요 지하철역</span></h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          {district.nearbyStationsData.map((s) => (
+            <span class="tag tag-accent" style="padding: 11px 18px; font-size: 0.92rem;">{stationLabel(s)}</span>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">이용 장소에 따라 <span class="accent">확인할 내용</span></h2>
+      <div class="card-grid">
+        {useCases.map((uc) => (
+          <a href={`/use/${uc.slug}/`} class="card">
+            <h3 class="card__title">{uc.label}</h3>
+            <p class="card__desc">{uc.summary}</p>
+            <span class="card__link">확인하기 →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <Checklist />
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <PriceTable title={`${dName} 출장마사지 가격표`} />
+    </section>
+
+    <PhoneCTA region={`인천 ${dName}`} />
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>
+      <FAQ faqs={faqs} />
+    </section>
+
+    <ExternalSources links={[
+      { label: '인천광역시', url: 'https://www.incheon.go.kr', desc: '인천 행정정보' },
+    ]} />
+
+  </div>
+</BaseLayout>

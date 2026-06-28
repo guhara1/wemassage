@@ -1,0 +1,25 @@
+---
+/**
+ * 브레드크럼 (시각적 표시용)
+ * 스키마는 별도 breadcrumbSchema()로 생성.
+ */
+import type { BreadcrumbItem } from '../lib/types';
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label="경로">
+  {items.map((item, idx) => (
+    <span>
+      {idx > 0 && <span class="breadcrumb__sep">/</span>}
+      {idx === items.length - 1 ? (
+        <span class="breadcrumb__current">{item.name}</span>
+      ) : (
+        <a href={item.url}>{item.name}</a>
+      )}
+    </span>
+  ))}
+</nav>

@@ -1,0 +1,133 @@
+---
+/**
+ * 경기 일반구 상세 페이지 (동적)
+ * /gyeonggi/[district]/[gu]/
+ * 일반구 보유 시(수원/성남/용인/고양/화성/부천/안산/안양)에만 생성.
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Checklist from '../../../components/Checklist.astro';
+import PriceTable from '../../../components/PriceTable.astro';
+import PhoneCTA from '../../../components/PhoneCTA.astro';
+import FAQ from '../../../components/FAQ.astro';
+import ExternalSources from '../../../components/ExternalSources.astro';
+import {
+  getGuDistricts,
+  getDongListByGu,
+  getAllUseCases,
+} from '../../../lib/data';
+import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+
+export const getStaticPaths = (() => {
+  const citySlugs = ['suwon', 'seongnam', 'yongin', 'goyang', 'hwaseong', 'bucheon', 'ansan', 'anyang'];
+  const paths: { params: { district: string; gu: string }; props: { cityName: string; guName: string } }[] = [];
+  for (const city of citySlugs) {
+    const gus = getGuDistricts(city);
+    for (const gu of gus) {
+      paths.push({
+        params: { district: city, gu: gu.slug },
+        props: { cityName: gu.name.replace(/구$/, ''), guName: gu.name },
+      });
+    }
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props { cityName: string; guName: string; }
+const { cityName, guName } = Astro.props;
+const { district, gu } = Astro.params;
+
+const path = `/gyeonggi/${district}/${gu}/`;
+const title = `${cityName} ${guName} 출장마사지｜행정동 방문 가능 지역 안내`;
+const description = `경기 ${cityName} ${guName} 출장마사지 예약 전 행정동별 방문 가능 지역과 이용 장소별 확인사항을 안내합니다.`;
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '경기', url: '/gyeonggi/' },
+  { name: cityName, url: `/gyeonggi/${district}/` },
+  { name: guName, url: path },
+];
+
+const useCases = getAllUseCases();
+const dongs = getDongListByGu(district!, gu!);
+
+const faqs = [
+  {
+    question: `${cityName} ${guName} 어디까지 방문 가능한가요?`,
+    answer: `${cityName} ${guName} 전 행정동 방문이 가능합니다. 단, 오피스텔·호텔은 관리 규정에 따라 출입이 제한될 수 있으니 예약 시 건물명과 출입 방식을 미리 안내해 주세요.`,
+  },
+  {
+    question: `${guName} 추가 이동비는 어떻게 되나요?`,
+    answer: `${cityName} ${guName} 기본 출장 이동비는 4만원이며, 신도시 외곽이나 심야 시간대에는 추가 이동비가 발생할 수 있습니다.`,
+  },
+];
+
+const schemas = [
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  faqPageSchema(faqs),
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container container-narrow">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 24px 0 32px;">
+      <div class="tag tag-accent" style="margin-bottom: 14px;">경기 · 일반구</div>
+      <h1 style="font-size: 2rem; font-weight: 800; line-height: 1.35; margin-bottom: 14px;">
+        {cityName} {guName} 출장마사지 · 행정동별 안내
+      </h1>
+      <p style="color: var(--color-text-soft); font-size: 1.05rem;">
+        {cityName} {guName}의 행정동별 방문 가능 지역과 예약 전 확인사항을 안내합니다.
+        행정동을 클릭하면 해당 동의 방문 환경을 자세히 확인할 수 있습니다.
+      </p>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">{guName} <span class="accent">행정동</span></h2>
+      <p class="section-subtitle">번호동(1동·2동 등)은 대표동으로 통합해 안내합니다.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {dongs.map((dong) => (
+          <a href={`/gyeonggi/${district}/${gu}/${dong.slug}/`} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">
+            {dong.name}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">이용 장소에 따라 <span class="accent">확인할 내용</span></h2>
+      <div class="card-grid">
+        {useCases.map((uc) => (
+          <a href={`/use/${uc.slug}/`} class="card">
+            <h3 class="card__title">{uc.label}</h3>
+            <p class="card__desc">{uc.summary}</p>
+            <span class="card__link">확인하기 →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <Checklist />
+    </section>
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <PriceTable title={`${cityName} ${guName} 출장마사지 가격표`} />
+    </section>
+
+    <PhoneCTA region={`경기 ${cityName} ${guName}`} />
+
+    <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>
+      <FAQ faqs={faqs} />
+    </section>
+
+    <ExternalSources links={[
+      { label: '경기도', url: 'https://www.gg.go.kr', desc: '경기 행정정보' },
+    ]} />
+
+  </div>
+</BaseLayout>

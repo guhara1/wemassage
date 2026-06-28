@@ -1,0 +1,107 @@
+---
+/**
+ * 지역별 보기 허브 (/area/)
+ * 스펙 8절 - 서울·경기·인천 모든 지역으로 연결되는 허브
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getDistricts, getReadyLifeAreas } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+
+const path = '/area/';
+const title = '수도권 출장마사지 지역별 보기｜서울·경기·인천 전체 안내';
+const description =
+  '서울·경기·인천 출장마사지 지역별 보기. 25개 행정구, 31개 시군, 9구 2군과 핵심 생활권·역세권으로 연결되는 허브입니다.';
+
+const breadcrumbs = [
+  { name: '홈', url: '/' },
+  { name: '지역별 보기', url: '/area/' },
+];
+
+const schemas = [
+  organizationSchema(),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+];
+
+const seoulDistricts = getDistricts('seoul');
+const gyeonggiDistricts = getDistricts('gyeonggi');
+const incheonDistricts = getDistricts('incheon');
+const readyAreas = getReadyLifeAreas();
+---
+
+<BaseLayout title={title} description={description} path={path} schemas={schemas}>
+  <div class="container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <section style="padding: 32px 0 40px;">
+      <div class="tag tag-accent" style="margin-bottom: 16px;">지역별 보기 · 수도권 매트릭스</div>
+      <h1 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 16px;">
+        서울·경기·인천 <span class="accent-text">지역별 보기</span>
+      </h1>
+      <p style="font-size: 1.05rem; color: var(--color-text-soft); max-width: 680px; line-height: 1.7;">
+        수도권 전체를 행정구역 기준으로 찾는 허브입니다. 서울 25개 행정구, 경기 31개 시·군,
+        인천 9구 2군(2026.7.1 개편 반영) 전체로 연결됩니다. 행정구역 외에도
+        <a href="/life/">생활권</a>·<a href="/station/">지하철역</a> 기준으로 찾을 수 있습니다.
+      </p>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border); padding-top: 48px;">
+      <h2 class="section-title">서울 <span class="accent">25개 행정구</span></h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {seoulDistricts.map((d) => (
+          <a href={`/seoul/${d.slug}/`} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">{d.name}</a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">경기 <span class="accent">31개 시·군</span></h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {gyeonggiDistricts.map((d) => (
+          <a href={`/gyeonggi/${d.slug}/`} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">{d.name}</a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">인천 <span class="accent">9구 2군</span></h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {incheonDistricts.map((d) => (
+          <a href={`/incheon/${d.slug}/`} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">{d.name}</a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">핵심 <span class="accent">생활권 바로가기</span></h2>
+      <p class="section-subtitle">행정구역이 아닌 실제 생활권 단위로 이동하세요.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {readyAreas.map((area) => (
+          <a href={`/${area.province}/life/${area.slug}/`} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">
+            {area.name}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <h2 class="section-title">다른 기준으로 <span class="accent">찾기</span></h2>
+      <div class="card-grid">
+        <a href="/life/" class="card">
+          <h3 class="card__title">생활권 보기</h3>
+          <p class="card__desc">강남역·역삼, 분당·판교, 송도국제도시 등 실제 생활권 기준.</p>
+        </a>
+        <a href="/station/" class="card">
+          <h3 class="card__title">지하철역 보기</h3>
+          <p class="card__desc">강남역, 수원역, 부평역 등 역세권 기준.</p>
+        </a>
+        <a href="/use/" class="card">
+          <h3 class="card__title">이용 장소 보기</h3>
+          <p class="card__desc">자택·호텔·오피스텔·업무지구·외곽 기준.</p>
+        </a>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

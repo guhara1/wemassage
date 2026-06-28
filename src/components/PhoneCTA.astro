@@ -1,0 +1,36 @@
+---
+/**
+ * 전화 CTA 섹션
+ * props로 title/desc/region을 받아 전화예약 유도.
+ */
+import { siteConfig } from '../data/site';
+
+interface Props {
+  title?: string;
+  desc?: string;
+  region?: string; // 예: "서울 강남구 역삼동"
+}
+const { title, desc, region } = Astro.props;
+
+const ctaTitle = title ?? '전화로 빠르게 예약하세요';
+const ctaDesc =
+  desc ??
+  (region
+    ? `${region} 방문 가능 지역과 예약 시간을 전화로 안내받으세요.`
+    : '방문 가능 지역과 예약 시간을 전화로 안내받으세요.');
+---
+
+<section class="phone-cta">
+  <h2 class="phone-cta__title">{ctaTitle}</h2>
+  <p class="phone-cta__desc">{ctaDesc}</p>
+  {siteConfig.phoneTel && (
+    <>
+      <div class="phone-cta__number">📞 {siteConfig.phoneDisplay}</div>
+      <div style="margin-top: 24px; position: relative;">
+        <a href={`tel:${siteConfig.phoneTel}`} class="btn btn-phone btn-lg">
+          지금 전화하기
+        </a>
+      </div>
+    </>
+  )}
+</section>

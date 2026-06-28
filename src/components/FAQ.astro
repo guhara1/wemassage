@@ -1,0 +1,24 @@
+---
+/**
+ * FAQ 컴포넌트 (접이식 details/summary)
+ * props로 FAQ 배열을 받아 렌더링.
+ */
+import type { FAQItem } from '../lib/types';
+
+interface Props {
+  faqs: FAQItem[];
+}
+const { faqs } = Astro.props;
+---
+
+<div class="faq-list">
+  {faqs.map((faq) => (
+    <details class="faq-item">
+      <summary class="faq-item__question">
+        <span>{faq.question}</span>
+        <span class="faq-item__icon">+</span>
+      </summary>
+      <div class="faq-item__answer">{faq.answer}</div>
+    </details>
+  ))}
+</div>
