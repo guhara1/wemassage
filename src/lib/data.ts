@@ -53,11 +53,15 @@ export function getLifeAreasByProvince(province: Province): LifeArea[] {
   return lifeAreasByProvince[province];
 }
 
-/** 1차 색인 대상 생활권 (indexPriority === 1 && ready) */
+/**
+ * 색인 대상 생활권 (contentStatus === 'ready' 전체)
+ * 콘텐츠가 준비된 생활권은 priority(1·2·3)에 무관하게 페이지를 생성한다.
+ * noindex 항목은 페이지 생성에서 제외(생성 시 noindex 메타 처리).
+ */
 export function getReadyLifeAreas(province?: Province): LifeArea[] {
   const source = province ? lifeAreasByProvince[province] : getAllLifeAreas();
   return source.filter(
-    (area) => area.indexPriority === 1 && area.contentStatus === 'ready'
+    (area) => area.contentStatus === 'ready' && !area.noindex
   );
 }
 

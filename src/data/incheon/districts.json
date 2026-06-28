@@ -7,7 +7,7 @@
     "description": "인천 도심·내륙 중심. 2026.7.1 개편으로 영종·용유가 영종구로 분리된 잔여 중구.",
     "searchIntent": "인천 출장마사지, 중구 홈타이",
     "contentFocus": "원도심·숙소 인접권",
-    "representativeLifeAreas": ["yeouido-yeongdeungpo"],
+    "representativeLifeAreas": [],
     "nearbyStationsData": ["dongincheon-station"],
     "dongs": ["연안동", "신포동", "신흥동", "도원동", "율목동", "북성동", "중앙동", "항동", "선화동", "관동1가", "관동2가", "관동3가", "내동", "용동", "사동", "송월동", "인현동", "도원동"],
     "indexPriority": 1,
