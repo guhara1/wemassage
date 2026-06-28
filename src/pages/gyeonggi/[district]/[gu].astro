@@ -12,12 +12,14 @@ import PriceTable from '../../../components/PriceTable.astro';
 import PhoneCTA from '../../../components/PhoneCTA.astro';
 import FAQ from '../../../components/FAQ.astro';
 import ExternalSources from '../../../components/ExternalSources.astro';
+import RelatedLinks from '../../../components/RelatedLinks.astro';
+import Reviews from '../../../components/Reviews.astro';
 import {
   getGuDistricts,
   getDongListByGu,
   getAllUseCases,
 } from '../../../lib/data';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import { webPageSchema, breadcrumbSchema, faqPageSchema, serviceSchema } from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
   // citySlug → 한국어 시 이름 매핑
@@ -75,9 +77,27 @@ const faqs = [
 ];
 
 const schemas = [
+  serviceSchema({
+    name: `${cityName} ${guName} 출장마사지`,
+    description,
+    areaServed: ['경기', cityName, guName],
+    path,
+  }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(faqs),
+];
+
+// 같은 시의 다른 일반구 + 상위 시 롱테일 링크
+const siblingLinks = [
+  { name: `${cityName} 출장마사지`, href: `/gyeonggi/${district}/`, badge: '상위 시' },
+  ...getGuDistricts(district!)
+    .filter((g) => g.slug !== gu)
+    .map((g) => ({
+      name: `${cityName} ${g.name} 출장마사지`,
+      href: `/gyeonggi/${district}/${g.slug}/`,
+      badge: '같은 시',
+    })),
 ];
 ---
 
@@ -130,6 +150,15 @@ const schemas = [
     </section>
 
     <PhoneCTA region={`경기 ${cityName} ${guName}`} />
+
+    <Reviews title={`${cityName} ${guName} 출장마사지 이용자 후기`} />
+
+    <RelatedLinks
+      title={`${cityName} 주변 일반구 출장마사지`}
+      subtitle="같은 시의 다른 일반구 방문 가능 지역도 함께 확인하세요."
+      links={siblingLinks}
+      variant="chip"
+    />
 
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>

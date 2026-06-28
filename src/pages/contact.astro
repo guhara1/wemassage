@@ -6,7 +6,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { siteConfig } from '../data/site';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../lib/schema';
+import { breadcrumbSchema, webPageSchema, organizationSchema, serviceSchema } from '../lib/schema';
 
 const path = '/contact/';
 const title = '고객센터｜수도권 출장마사지 예약 문의 및 안내';
@@ -20,6 +20,7 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  serviceSchema({ description, path }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];

@@ -1,0 +1,46 @@
+---
+/**
+ * 이용자 후기 컴포넌트
+ * 실제 후기(reviews.json)가 있을 때만 평균 평점과 후기 목록을 노출한다.
+ * 후기가 없으면 아무것도 렌더링하지 않는다(허위 후기·가짜 평점 금지 정책).
+ * 화면 표시 내용과 Review/AggregateRating 스키마가 항상 일치하도록 같은 데이터를 사용.
+ */
+import { getReviews, getAggregateRating } from '../lib/data';
+
+interface Props {
+  title?: string;
+}
+const { title = '이용자 후기' } = Astro.props;
+
+const reviews = getReviews();
+const agg = getAggregateRating();
+const fullStars = agg ? Math.round(agg.ratingValue) : 0;
+---
+
+{reviews.length > 0 && agg && (
+  <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+    <h2 class="section-title">{title}</h2>
+    <div class="review-summary">
+      <span class="review-summary__score">{agg.ratingValue.toFixed(1)}</span>
+      <span class="review-summary__stars" aria-hidden="true">
+        {'★'.repeat(fullStars)}{'☆'.repeat(Math.max(0, 5 - fullStars))}
+      </span>
+      <span class="review-summary__count">후기 {agg.reviewCount}건 기준</span>
+    </div>
+    <div class="review-list">
+      {reviews.map((r) => (
+        <div class="review-item">
+          <div class="review-item__head">
+            <strong>{r.author}</strong>
+            <span class="review-item__rating" aria-label={`평점 ${r.rating}점`}>
+              {'★'.repeat(Math.round(r.rating))}
+            </span>
+            {r.region && <span class="review-item__region">{r.region}</span>}
+            <span class="review-item__date">{r.date}</span>
+          </div>
+          <p class="review-item__body">{r.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}

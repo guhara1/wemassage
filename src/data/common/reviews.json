@@ -1,0 +1,4 @@
+{
+  "_comment": "실제 이용자 후기만 입력하세요. items가 비어 있으면 후기/평점 스키마와 화면 표시가 모두 생성되지 않습니다(허위 후기·가짜 평점 금지 정책 준수). 후기 추가 시 author/rating(1~5)/body/date(YYYY-MM-DD) 필수, region은 선택.",
+  "items": []
+}

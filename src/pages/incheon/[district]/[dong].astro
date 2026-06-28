@@ -10,13 +10,15 @@ import Checklist from '../../../components/Checklist.astro';
 import PriceTable from '../../../components/PriceTable.astro';
 import PhoneCTA from '../../../components/PhoneCTA.astro';
 import FAQ from '../../../components/FAQ.astro';
+import RelatedLinks from '../../../components/RelatedLinks.astro';
+import Reviews from '../../../components/Reviews.astro';
 import {
   getDistricts,
   getDongList,
   getAllUseCases,
   postposition,
 } from '../../../lib/data';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import { webPageSchema, breadcrumbSchema, faqPageSchema, serviceSchema } from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
   const incheon = getDistricts('incheon');
@@ -62,9 +64,28 @@ const faqs = [
 ];
 
 const schemas = [
+  serviceSchema({
+    name: `인천 ${districtName} ${dongName} 출장마사지`,
+    description,
+    areaServed: ['인천', districtName],
+    path,
+  }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(faqs),
+];
+
+// 같은 구·군의 다른 행정동·읍면 + 상위 구·군 롱테일 링크
+const siblingLinks = [
+  { name: `${districtName} 출장마사지`, href: `/incheon/${district}/`, badge: '상위 구·군' },
+  ...getDongList('incheon', district!)
+    .filter((d) => d.slug !== dong)
+    .slice(0, 8)
+    .map((d) => ({
+      name: `${districtName} ${d.name} 출장마사지`,
+      href: `/incheon/${district}/${d.slug}/`,
+      badge: '같은 구·군',
+    })),
 ];
 ---
 
@@ -126,6 +147,15 @@ const schemas = [
     </section>
 
     <PhoneCTA region={`인천 ${districtName} ${dongName}`} />
+
+    <Reviews title={`인천 ${districtName} ${dongName} 출장마사지 이용자 후기`} />
+
+    <RelatedLinks
+      title={`${districtName} 주변 행정동·읍면 출장마사지`}
+      subtitle="같은 구·군의 다른 지역 방문 가능 지역도 함께 확인하세요."
+      links={siblingLinks}
+      variant="chip"
+    />
 
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>

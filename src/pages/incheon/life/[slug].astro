@@ -11,9 +11,22 @@ import Checklist from '../../../components/Checklist.astro';
 import PriceTable from '../../../components/PriceTable.astro';
 import PhoneCTA from '../../../components/PhoneCTA.astro';
 import ExternalSources from '../../../components/ExternalSources.astro';
-import { getReadyLifeAreas, PROVINCE_LABEL } from '../../../lib/data';
+import RelatedLinks from '../../../components/RelatedLinks.astro';
+import Reviews from '../../../components/Reviews.astro';
+import {
+  getReadyLifeAreas,
+  PROVINCE_LABEL,
+  getLifeAreaRelatedLinks,
+  getLifeAreaStationLinks,
+} from '../../../lib/data';
 import type { LifeArea, UseCaseSlug } from '../../../lib/types';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import {
+  webPageSchema,
+  breadcrumbSchema,
+  faqPageSchema,
+  serviceSchema,
+  itemListSchema,
+} from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
   return getReadyLifeAreas('incheon').map((area) => ({
@@ -34,10 +47,23 @@ const breadcrumbs = [
   { name: area.name, url: path },
 ];
 
+const relatedLinks = getLifeAreaRelatedLinks(area);
+const stationLinks = getLifeAreaStationLinks(area);
+
 const schemas = [
+  serviceSchema({
+    name: `인천 ${area.name} 출장마사지`,
+    description,
+    areaServed: ['인천', area.name],
+    path,
+  }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(area.faq ?? []),
+  itemListSchema(
+    relatedLinks.map((l) => ({ name: l.name, url: l.href })),
+    `인천 ${area.name} 관련 지역`
+  ),
 ];
 
 const UC_LABEL: Record<UseCaseSlug, string> = {
@@ -92,11 +118,26 @@ const UC_LABEL: Record<UseCaseSlug, string> = {
       </section>
     )}
 
+    <RelatedLinks
+      title={`인천 ${area.name} 주변 추천 지역`}
+      subtitle="인접 생활권과 행정구역의 방문 가능 지역도 함께 확인하세요."
+      links={relatedLinks}
+    />
+
+    <RelatedLinks
+      title={`${area.name} 인근 역세권`}
+      subtitle="가까운 지하철역 기준으로 방문 가능 지역을 확인하세요."
+      links={stationLinks}
+      variant="chip"
+    />
+
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <Checklist />
     </section>
 
     <PhoneCTA region={`인천 ${area.name}`} />
+
+    <Reviews title={`인천 ${area.name} 출장마사지 이용자 후기`} />
 
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <PriceTable title={`인천 ${area.name} 출장마사지 가격표`} />

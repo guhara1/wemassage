@@ -1028,3 +1028,57 @@ ul, ol { list-style: none; }
   .mobile-call-bar { display: block; }
   main { padding-bottom: 80px; }
 }
+
+/* ==========================================================================
+   이용자 후기 (reviews.json에 실제 후기가 있을 때만 노출)
+   ========================================================================== */
+.review-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.review-summary__score {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1;
+}
+.review-summary__stars {
+  color: var(--color-accent-bright);
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+.review-summary__count {
+  font-size: 0.9rem;
+  color: var(--color-text-soft);
+}
+.review-list {
+  display: grid;
+  gap: 14px;
+}
+.review-item {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.review-item__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: var(--color-text-soft);
+}
+.review-item__head strong { color: var(--color-text); }
+.review-item__rating { color: var(--color-accent-bright); letter-spacing: 1px; }
+.review-item__region,
+.review-item__date { font-size: 0.82rem; }
+.review-item__body {
+  color: var(--color-text-soft);
+  line-height: 1.75;
+  margin: 0;
+}

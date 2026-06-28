@@ -7,14 +7,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Checklist from '../components/Checklist.astro';
 import PriceTable from '../components/PriceTable.astro';
 import PhoneCTA from '../components/PhoneCTA.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import Reviews from '../components/Reviews.astro';
 import { siteConfig } from '../data/site';
-import { getReadyLifeAreas, getAllUseCases } from '../lib/data';
+import { getReadyLifeAreas, getAllUseCases, getLongtailLifeLinks } from '../lib/data';
 import {
   webPageSchema,
   breadcrumbSchema,
   organizationSchema,
   webSiteSchema,
   imageObjectSchema,
+  serviceSchema,
+  itemListSchema,
 } from '../lib/schema';
 
 const path = '/';
@@ -33,11 +37,27 @@ const breadcrumbs = [
   { name: '수도권 출장마사지', url: '/' },
 ];
 
+// 롱테일 내부 링크 (생활권 검색어형 앵커)
+const longtailLinks = getLongtailLifeLinks();
+
+// 메인 내부 링크 구조 ItemList (지역 허브 + 핵심 생활권)
+const listItems = [
+  { name: '서울 출장마사지', url: '/seoul/' },
+  { name: '경기 출장마사지', url: '/gyeonggi/' },
+  { name: '인천 출장마사지', url: '/incheon/' },
+  ...getReadyLifeAreas().map((a) => ({
+    name: `${a.name} 출장마사지`,
+    url: `/${a.province}/life/${a.slug}/`,
+  })),
+];
+
 const schemas = [
   organizationSchema(),
   webSiteSchema(),
+  serviceSchema({ path }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
+  itemListSchema(listItems, '수도권 출장마사지 지역·생활권 안내'),
   imageObjectSchema('/og-image.webp'),
 ];
 ---
@@ -208,6 +228,9 @@ const schemas = [
     {/* === 전화 CTA === */}
     <PhoneCTA />
 
+    {/* === 이용자 후기 (실제 후기 있을 때만 노출) === */}
+    <Reviews title="수도권 출장마사지 이용자 후기" />
+
     {/* === Section 4. 수도권 핵심 생활권 === */}
     <section class="section">
       <h2 class="section-title">수도권 주요 <span class="accent">생활권별 방문 가능 지역</span></h2>
@@ -269,6 +292,14 @@ const schemas = [
         </>
       )}
     </section>
+
+    {/* === 인기 검색 지역 롱테일 바로가기 === */}
+    <RelatedLinks
+      title="인기 검색 지역 바로가기"
+      subtitle="자주 찾는 생활권·역세권 키워드로 바로 이동하세요."
+      links={longtailLinks}
+      variant="chip"
+    />
 
     <hr class="divider" />
 

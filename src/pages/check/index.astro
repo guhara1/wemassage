@@ -7,7 +7,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Checklist from '../../components/Checklist.astro';
 import PriceTable from '../../components/PriceTable.astro';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import Reviews from '../../components/Reviews.astro';
+import {
+  breadcrumbSchema,
+  webPageSchema,
+  organizationSchema,
+  serviceSchema,
+} from '../../lib/schema';
 
 const path = '/check/';
 const title = '출장마사지 예약 전 확인사항｜방문 주소·출입·이동비·개인정보 안내';
@@ -21,6 +27,7 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  serviceSchema({ description, path }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];
@@ -46,6 +53,8 @@ const schemas = [
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <PriceTable />
     </section>
+
+    <Reviews title="출장마사지 이용자 후기" />
 
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <div class="callout callout-warning">

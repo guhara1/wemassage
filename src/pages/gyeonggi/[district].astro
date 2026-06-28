@@ -12,6 +12,8 @@ import PriceTable from '../../components/PriceTable.astro';
 import PhoneCTA from '../../components/PhoneCTA.astro';
 import FAQ from '../../components/FAQ.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import Reviews from '../../components/Reviews.astro';
 import {
   getDistricts,
   findLifeAreaBySlug,
@@ -19,10 +21,17 @@ import {
   getDongList,
   getGuDistricts,
   hasGuDistricts,
+  getNearbyDistrictLinks,
   stationLabel,
 } from '../../lib/data';
 import type { DistrictData } from '../../lib/types';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../lib/schema';
+import {
+  webPageSchema,
+  breadcrumbSchema,
+  faqPageSchema,
+  serviceSchema,
+  itemListSchema,
+} from '../../lib/schema';
 
 export const getStaticPaths = (() => {
   return getDistricts('gyeonggi').map((d) => ({
@@ -67,10 +76,22 @@ const faqs = [
   },
 ];
 
+const nearbyDistrictLinks = getNearbyDistrictLinks('gyeonggi', district.slug);
+
 const schemas = [
+  serviceSchema({
+    name: `경기 ${dName} 출장마사지`,
+    description,
+    areaServed: ['경기', dName],
+    path,
+  }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(faqs),
+  itemListSchema(
+    nearbyDistrictLinks.map((l) => ({ name: l.name, url: l.href })),
+    `경기 ${dName} 주변 지역`
+  ),
 ];
 
 const dongs = getDongList('gyeonggi', district.slug);
@@ -152,6 +173,12 @@ const dongs = getDongList('gyeonggi', district.slug);
       </div>
     </section>
 
+    <RelatedLinks
+      title={`경기 ${dName} 주변 지역 출장마사지`}
+      subtitle="가까운 다른 시·군의 방문 가능 지역도 함께 확인하세요."
+      links={nearbyDistrictLinks}
+    />
+
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <Checklist />
     </section>
@@ -161,6 +188,8 @@ const dongs = getDongList('gyeonggi', district.slug);
     </section>
 
     <PhoneCTA region={`경기 ${dName}`} />
+
+    <Reviews title={`경기 ${dName} 출장마사지 이용자 후기`} />
 
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>

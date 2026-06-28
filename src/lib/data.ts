@@ -12,6 +12,9 @@ import type {
   ChecklistItem,
   PriceTableData,
   Province,
+  Review,
+  ReviewsData,
+  RelatedLink,
 } from './types';
 import { romanize } from './romanize';
 import seoulLifeAreas from '../data/seoul/life-areas.json';
@@ -24,6 +27,7 @@ import gyeonggiCityDistricts from '../data/gyeonggi/city-districts.json';
 import useCasesData from '../data/common/use-cases.json';
 import checklistData from '../data/common/checklists.json';
 import priceTableData from '../data/common/price-table.json';
+import reviewsData from '../data/common/reviews.json';
 
 type LifeAreaMap = Record<Province, LifeArea[]>;
 
@@ -110,6 +114,36 @@ export function getChecklist(): ChecklistItem[] {
 
 export function getPriceTable(): PriceTableData {
   return priceTableData as PriceTableData;
+}
+
+/* === 후기·평점 (실제 후기 입력 시에만 노출) === */
+
+/** 실제 입력된 이용자 후기 목록 (없으면 빈 배열) */
+export function getReviews(): Review[] {
+  const data = reviewsData as unknown as ReviewsData;
+  return Array.isArray(data.items) ? data.items : [];
+}
+
+/** 후기 존재 여부 */
+export function hasReviews(): boolean {
+  return getReviews().length > 0;
+}
+
+/**
+ * 실제 후기 기반 평균 평점 집계.
+ * 후기가 없으면 null → AggregateRating 스키마/별점 미생성(가짜 평점 금지).
+ */
+export function getAggregateRating(): {
+  ratingValue: number;
+  reviewCount: number;
+  bestRating: number;
+  worstRating: number;
+} | null {
+  const items = getReviews();
+  if (items.length === 0) return null;
+  const sum = items.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+  const ratingValue = Math.round((sum / items.length) * 10) / 10;
+  return { ratingValue, reviewCount: items.length, bestRating: 5, worstRating: 1 };
 }
 
 /* === 유틸 === */
@@ -370,4 +404,97 @@ const STATION_LABELS: Record<string, string> = {
 
 export function stationLabel(slug: string): string {
   return STATION_LABELS[slug] ?? slug.replace(/-/g, ' ');
+}
+
+/* ==========================================================================
+   내부 링크(롱테일) 빌더 — 메인/지역/생활권 페이지 상호 연결 강화
+   ========================================================================== */
+
+/**
+ * 생활권 상세 페이지의 롱테일 관련 링크 묶음.
+ * - 인접 생활권(nearbyAreas): "{지역} {생활권} 출장마사지·홈타이"
+ * - 관련 행정구역(relatedDistricts): "{지역} {구·시군} 출장마사지"
+ * 색인 제외(noindex)·미준비(draft) 항목은 링크하지 않는다.
+ */
+export function getLifeAreaRelatedLinks(area: LifeArea): RelatedLink[] {
+  const out: RelatedLink[] = [];
+  const seen = new Set<string>([area.canonicalUrl]);
+
+  for (const slug of area.nearbyAreas ?? []) {
+    const a = findLifeAreaBySlug(slug);
+    if (!a || a.contentStatus !== 'ready' || a.noindex) continue;
+    const href = `/${a.province}/life/${a.slug}/`;
+    if (seen.has(href)) continue;
+    seen.add(href);
+    out.push({
+      name: `${PROVINCE_LABEL[a.province]} ${a.name} 출장마사지·홈타이`,
+      href,
+      desc: a.description,
+      badge: '인접 생활권',
+    });
+  }
+
+  for (const slug of area.relatedDistricts ?? []) {
+    const d = getDistrict(area.province, slug);
+    if (!d || d.contentStatus !== 'ready' || d.noindex) continue;
+    const href = `/${area.province}/${d.slug}/`;
+    if (seen.has(href)) continue;
+    seen.add(href);
+    out.push({
+      name: `${PROVINCE_LABEL[area.province]} ${d.name} 출장마사지`,
+      href,
+      desc: d.contentFocus,
+      badge: '행정구역',
+    });
+  }
+
+  return out;
+}
+
+/** 생활권의 관련 역세권 칩 링크(롱테일 앵커, 역세권 허브로 연결) */
+export function getLifeAreaStationLinks(area: LifeArea): RelatedLink[] {
+  const seen = new Set<string>();
+  const out: RelatedLink[] = [];
+  for (const slug of area.relatedStations ?? []) {
+    const label = stationLabel(slug);
+    if (seen.has(label)) continue;
+    seen.add(label);
+    out.push({ name: `${label} 출장마사지`, href: '/station/' });
+  }
+  return out;
+}
+
+/**
+ * 행정구역(구·시군) 상세 페이지의 "주변 지역" 롱테일 링크.
+ * 같은 광역단체 내 다른 색인 대상 구·시군으로 연결한다(자기 자신 제외).
+ */
+export function getNearbyDistrictLinks(
+  province: Province,
+  currentSlug: string,
+  limit = 8
+): RelatedLink[] {
+  return getDistricts(province)
+    .filter((d) => d.slug !== currentSlug && !d.noindex)
+    .slice(0, limit)
+    .map((d) => ({
+      name: `${PROVINCE_LABEL[province]} ${d.name} 출장마사지`,
+      href: `/${province}/${d.slug}/`,
+      desc: d.contentFocus,
+      badge: '주변 지역',
+    }));
+}
+
+/**
+ * 메인/허브용 롱테일 바로가기 칩.
+ * 각 생활권의 searchIntent 첫 구절(실제 검색어 형태)을 앵커로 사용한다.
+ */
+export function getLongtailLifeLinks(province?: Province): RelatedLink[] {
+  return getReadyLifeAreas(province).map((area) => {
+    const anchor = (area.searchIntent || '').split(',')[0].trim() || `${area.name} 출장마사지`;
+    return {
+      name: anchor,
+      href: `/${area.province}/life/${area.slug}/`,
+      badge: PROVINCE_LABEL[area.province],
+    };
+  });
 }

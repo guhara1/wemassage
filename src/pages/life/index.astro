@@ -6,7 +6,13 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getReadyLifeAreas } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import {
+  breadcrumbSchema,
+  webPageSchema,
+  organizationSchema,
+  serviceSchema,
+  itemListSchema,
+} from '../../lib/schema';
 
 const path = '/life/';
 const title = '수도권 출장마사지 생활권 보기｜업무지구·신도시·역세권·주거';
@@ -18,15 +24,22 @@ const breadcrumbs = [
   { name: '생활권 보기', url: '/life/' },
 ];
 
-const schemas = [
-  organizationSchema(),
-  breadcrumbSchema(breadcrumbs),
-  webPageSchema(path, title, description, breadcrumbs),
-];
-
 const seoulAreas = getReadyLifeAreas('seoul');
 const gyeonggiAreas = getReadyLifeAreas('gyeonggi');
 const incheonAreas = getReadyLifeAreas('incheon');
+
+const listItems = getReadyLifeAreas().map((a) => ({
+  name: `${a.name} 출장마사지`,
+  url: `/${a.province}/life/${a.slug}/`,
+}));
+
+const schemas = [
+  organizationSchema(),
+  serviceSchema({ description, path }),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  itemListSchema(listItems, '수도권 출장마사지 생활권별 안내'),
+];
 ---
 
 <BaseLayout title={title} description={description} path={path} schemas={schemas}>

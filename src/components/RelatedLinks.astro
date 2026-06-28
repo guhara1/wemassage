@@ -1,0 +1,47 @@
+---
+/**
+ * 관련 링크(롱테일 내부 링크) 컴포넌트
+ * - variant="card": 설명이 있는 카드 그리드 (인접 생활권·행정구역 등)
+ * - variant="chip": 칩 형태의 롱테일 바로가기 (검색어형 앵커)
+ * 링크가 없으면 아무것도 렌더링하지 않는다.
+ */
+import type { RelatedLink } from '../lib/types';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  links: RelatedLink[];
+  variant?: 'card' | 'chip';
+}
+const { title, subtitle, links, variant = 'card' } = Astro.props;
+---
+
+{links && links.length > 0 && (
+  <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+    <h2 class="section-title">{title}</h2>
+    {subtitle && <p class="section-subtitle">{subtitle}</p>}
+
+    {variant === 'card' ? (
+      <div class="card-grid">
+        {links.map((link) => (
+          <a href={link.href} class="card">
+            {link.badge && (
+              <div class="tag tag-accent" style="margin-bottom: 10px; display: inline-block;">{link.badge}</div>
+            )}
+            <h3 class="card__title">{link.name}</h3>
+            {link.desc && <p class="card__desc">{link.desc}</p>}
+            <span class="card__link">방문 가능 지역 보기 →</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {links.map((link) => (
+          <a href={link.href} class="tag tag-link" style="padding: 11px 18px; font-size: 0.92rem;">
+            {link.name}
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+)}

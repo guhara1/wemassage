@@ -11,13 +11,15 @@ import Checklist from '../../../components/Checklist.astro';
 import PriceTable from '../../../components/PriceTable.astro';
 import PhoneCTA from '../../../components/PhoneCTA.astro';
 import FAQ from '../../../components/FAQ.astro';
+import RelatedLinks from '../../../components/RelatedLinks.astro';
+import Reviews from '../../../components/Reviews.astro';
 import {
   getDistrict,
   getDongList,
   getAllUseCases,
   postposition,
 } from '../../../lib/data';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import { webPageSchema, breadcrumbSchema, faqPageSchema, serviceSchema } from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
   const districts = ['gangnam-gu','seocho-gu','songpa-gu','gangdong-gu','mapo-gu','seodaemun-gu','eunpyeong-gu','yeongdeungpo-gu','guro-gu','geumcheon-gu','gangseo-gu','yangcheon-gu','gwanak-gu','dongjak-gu','seongdong-gu','gwangjin-gu','dongdaemun-gu','jungnang-gu','nowon-gu','dobong-gu','gangbuk-gu','seongbuk-gu','jongno-gu','jung-gu','yongsan-gu'];
@@ -66,9 +68,28 @@ const faqs = [
 ];
 
 const schemas = [
+  serviceSchema({
+    name: `서울 ${districtName} ${dongName} 출장마사지`,
+    description,
+    areaServed: ['서울', districtName],
+    path,
+  }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(faqs),
+];
+
+// 같은 구의 다른 행정동 + 상위 구 롱테일 링크
+const siblingLinks = [
+  { name: `${districtName} 출장마사지`, href: `/seoul/${district}/`, badge: '상위 행정구' },
+  ...getDongList('seoul', district!)
+    .filter((d) => d.slug !== dong)
+    .slice(0, 8)
+    .map((d) => ({
+      name: `${districtName} ${d.name} 출장마사지`,
+      href: `/seoul/${district}/${d.slug}/`,
+      badge: '같은 구',
+    })),
 ];
 ---
 
@@ -124,6 +145,15 @@ const schemas = [
     </section>
 
     <PhoneCTA region={`서울 ${districtName} ${dongName}`} />
+
+    <Reviews title={`서울 ${districtName} ${dongName} 출장마사지 이용자 후기`} />
+
+    <RelatedLinks
+      title={`${districtName} 주변 행정동 출장마사지`}
+      subtitle="같은 행정구의 다른 동 방문 가능 지역도 함께 확인하세요."
+      links={siblingLinks}
+      variant="chip"
+    />
 
     <section class="section-sm" style="border-top: 1px solid var(--color-border);">
       <h2 class="section-title" style="font-size: 1.5rem;">자주 묻는 질문</h2>

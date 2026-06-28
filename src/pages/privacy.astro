@@ -5,7 +5,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { siteConfig } from '../data/site';
-import { breadcrumbSchema, webPageSchema } from '../lib/schema';
+import { breadcrumbSchema, webPageSchema, organizationSchema, serviceSchema } from '../lib/schema';
 
 const path = '/privacy/';
 const title = '개인정보 처리방침｜WE 마사지';
@@ -18,6 +18,8 @@ const breadcrumbs = [
 ];
 
 const schemas = [
+  organizationSchema(),
+  serviceSchema({ description, path }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];

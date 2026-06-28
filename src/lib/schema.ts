@@ -13,6 +13,7 @@
  */
 import type { FAQItem, BreadcrumbItem } from './types';
 import { siteConfig } from '../data/site';
+import { getPriceTable, getReviews, getAggregateRating } from './data';
 
 /** 사이트 절대 URL 생성 */
 export function absUrl(path: string): string {
@@ -150,6 +151,138 @@ export function webSiteSchema() {
       },
       'query-input': 'required name=search_term_string',
     },
+  };
+}
+
+/** 가격 문자열("100,000원")에서 숫자만 추출 */
+function parsePrice(value: string): number {
+  const n = Number(String(value).replace(/[^0-9]/g, ''));
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * AggregateRating 스키마 — 실제 후기가 있을 때만 생성(없으면 null).
+ * 허위 후기·가짜 평점 금지 정책: reviews.json에 실제 후기가 입력된 경우에만 노출.
+ */
+export function aggregateRatingSchema() {
+  const agg = getAggregateRating();
+  if (!agg) return null;
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: agg.ratingValue,
+    reviewCount: agg.reviewCount,
+    bestRating: agg.bestRating,
+    worstRating: agg.worstRating,
+  };
+}
+
+/** Review 노드 배열 — 실제 후기가 있을 때만(없으면 빈 배열) */
+export function reviewNodes() {
+  return getReviews().map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.author },
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: r.rating,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    reviewBody: r.body,
+    datePublished: r.date,
+  }));
+}
+
+/**
+ * Service 스키마 — 방문형(출장) 서비스 본질에 맞는 핵심 스키마.
+ *  - provider: Organization
+ *  - areaServed: 서비스 제공 지역
+ *  - offers: 실제 가격표(price-table.json) 기반 AggregateOffer + OfferCatalog
+ *  - aggregateRating / review: 실제 후기가 있을 때만 부착(가짜 평점 금지)
+ */
+export function serviceSchema(opts?: {
+  name?: string;
+  description?: string;
+  areaServed?: string[];
+  path?: string;
+}) {
+  const price = getPriceTable();
+  const courses = price.courses ?? [];
+  const prices = courses.map((c) => parsePrice(c.price)).filter((n) => n > 0);
+  const lowPrice = prices.length ? Math.min(...prices) : undefined;
+  const highPrice = prices.length ? Math.max(...prices) : undefined;
+  const areas = opts?.areaServed ?? ['서울', '경기', '인천'];
+  const rating = aggregateRatingSchema();
+  const reviews = reviewNodes();
+
+  const offerCatalog =
+    courses.length > 0
+      ? {
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: '출장마사지 코스',
+            itemListElement: courses.map((c) => ({
+              '@type': 'Offer',
+              priceCurrency: 'KRW',
+              price: parsePrice(c.price),
+              itemOffered: {
+                '@type': 'Service',
+                name: c.name,
+                ...(c.desc ? { description: c.desc } : {}),
+              },
+            })),
+          },
+          offers: {
+            '@type': 'AggregateOffer',
+            priceCurrency: 'KRW',
+            ...(lowPrice ? { lowPrice } : {}),
+            ...(highPrice ? { highPrice } : {}),
+            offerCount: courses.length,
+          },
+        }
+      : {};
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    serviceType: '출장마사지',
+    name: opts?.name ?? `${siteConfig.name} 수도권 출장마사지`,
+    description: opts?.description ?? siteConfig.organization.description,
+    url: opts?.path ? absUrl(opts.path) : siteConfig.url,
+    provider: {
+      '@type': 'Organization',
+      name: siteConfig.organization.name,
+      url: siteConfig.organization.url,
+      ...(siteConfig.phoneTel
+        ? { telephone: `+82-${siteConfig.phoneDisplay?.replace(/^0/, '')}` }
+        : {}),
+    },
+    areaServed: areas.map((a) => ({ '@type': 'AdministrativeArea', name: a })),
+    ...offerCatalog,
+    ...(rating ? { aggregateRating: rating } : {}),
+    ...(reviews.length ? { review: reviews } : {}),
+  };
+}
+
+/**
+ * ItemList 스키마 — 허브/목록 페이지의 내부 링크 구조를 명시.
+ * 검색엔진의 사이트 구조 이해와 내부 링크 신호 강화에 사용.
+ */
+export function itemListSchema(
+  items: { name: string; url: string }[],
+  listName?: string
+) {
+  if (!items || items.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    ...(listName ? { name: listName } : {}),
+    numberOfItems: items.length,
+    itemListElement: items.map((item, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: item.name,
+      url: absUrl(item.url),
+    })),
   };
 }
 

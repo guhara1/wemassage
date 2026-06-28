@@ -6,7 +6,13 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getDistricts, getReadyLifeAreas } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import {
+  breadcrumbSchema,
+  webPageSchema,
+  organizationSchema,
+  serviceSchema,
+  itemListSchema,
+} from '../../lib/schema';
 
 const path = '/area/';
 const title = '수도권 출장마사지 지역별 보기｜서울·경기·인천 전체 안내';
@@ -18,16 +24,25 @@ const breadcrumbs = [
   { name: '지역별 보기', url: '/area/' },
 ];
 
-const schemas = [
-  organizationSchema(),
-  breadcrumbSchema(breadcrumbs),
-  webPageSchema(path, title, description, breadcrumbs),
-];
-
 const seoulDistricts = getDistricts('seoul');
 const gyeonggiDistricts = getDistricts('gyeonggi');
 const incheonDistricts = getDistricts('incheon');
 const readyAreas = getReadyLifeAreas();
+
+const listItems = [
+  ...seoulDistricts.map((d) => ({ name: `서울 ${d.name} 출장마사지`, url: `/seoul/${d.slug}/` })),
+  ...gyeonggiDistricts.map((d) => ({ name: `경기 ${d.name} 출장마사지`, url: `/gyeonggi/${d.slug}/` })),
+  ...incheonDistricts.filter((d) => !d.noindex).map((d) => ({ name: `인천 ${d.name} 출장마사지`, url: `/incheon/${d.slug}/` })),
+  ...readyAreas.map((a) => ({ name: `${a.name} 출장마사지`, url: `/${a.province}/life/${a.slug}/` })),
+];
+
+const schemas = [
+  organizationSchema(),
+  serviceSchema({ description, path }),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  itemListSchema(listItems, '수도권 출장마사지 지역별 전체 안내'),
+];
 ---
 
 <BaseLayout title={title} description={description} path={path} schemas={schemas}>

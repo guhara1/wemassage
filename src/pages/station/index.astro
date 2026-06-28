@@ -7,7 +7,13 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import {
+  breadcrumbSchema,
+  webPageSchema,
+  organizationSchema,
+  serviceSchema,
+  itemListSchema,
+} from '../../lib/schema';
 
 const path = '/station/';
 const title = '수도권 출장마사지 지하철역 보기｜강남역·수원역·부평역 역세권';
@@ -17,12 +23,6 @@ const description =
 const breadcrumbs = [
   { name: '홈', url: '/' },
   { name: '지하철역 보기', url: '/station/' },
-];
-
-const schemas = [
-  organizationSchema(),
-  breadcrumbSchema(breadcrumbs),
-  webPageSchema(path, title, description, breadcrumbs),
 ];
 
 // 핵심 역세권 생활권 안내 (대표 역 중심)
@@ -41,6 +41,17 @@ const keyStations = [
   { name: '부평역·부평시장', href: '/incheon/life/bupyeong-station-market/', region: '인천', lines: '1호선·인천1호선' },
   { name: '구월·인천시청', href: '/incheon/life/guwol-incheon-cityhall/', region: '인천', lines: '인천1호선' },
   { name: '영종·운서', href: '/incheon/life/yeongjong-unseo/', region: '인천', lines: '공항철도' },
+];
+
+const schemas = [
+  organizationSchema(),
+  serviceSchema({ description, path }),
+  breadcrumbSchema(breadcrumbs),
+  webPageSchema(path, title, description, breadcrumbs),
+  itemListSchema(
+    keyStations.map((s) => ({ name: `${s.name} 출장마사지`, url: s.href })),
+    '수도권 역세권별 출장마사지 안내'
+  ),
 ];
 ---
 

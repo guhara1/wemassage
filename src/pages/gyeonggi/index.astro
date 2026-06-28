@@ -8,8 +8,16 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Checklist from '../../components/Checklist.astro';
 import PriceTable from '../../components/PriceTable.astro';
 import PhoneCTA from '../../components/PhoneCTA.astro';
-import { getDistricts, getReadyLifeAreas } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import Reviews from '../../components/Reviews.astro';
+import { getDistricts, getReadyLifeAreas, getLongtailLifeLinks } from '../../lib/data';
+import {
+  breadcrumbSchema,
+  webPageSchema,
+  organizationSchema,
+  serviceSchema,
+  itemListSchema,
+} from '../../lib/schema';
 
 const path = '/gyeonggi/';
 const title = '경기 출장마사지｜31개 시·군 방문 가능 지역 안내';
@@ -24,10 +32,18 @@ const breadcrumbs = [
   { name: '경기', url: '/gyeonggi/' },
 ];
 
+const longtailLinks = getLongtailLifeLinks('gyeonggi');
+const listItems = [
+  ...districts.map((d) => ({ name: `경기 ${d.name} 출장마사지`, url: `/gyeonggi/${d.slug}/` })),
+  ...gyeonggiAreas.map((a) => ({ name: `${a.name} 출장마사지`, url: `/gyeonggi/life/${a.slug}/` })),
+];
+
 const schemas = [
   organizationSchema(),
+  serviceSchema({ name: '경기 출장마사지', description, areaServed: ['경기'], path }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
+  itemListSchema(listItems, '경기 출장마사지 시·군·생활권 안내'),
 ];
 ---
 
@@ -97,6 +113,15 @@ const schemas = [
         </div>
       </section>
     )}
+
+    <Reviews title="경기 출장마사지 이용자 후기" />
+
+    <RelatedLinks
+      title="경기 인기 검색 지역 바로가기"
+      subtitle="자주 찾는 생활권·역세권 키워드로 바로 이동하세요."
+      links={longtailLinks}
+      variant="chip"
+    />
 
     <section class="section" style="border-top: 1px solid var(--color-border);">
       <Checklist />

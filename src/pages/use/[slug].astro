@@ -12,7 +12,12 @@ import PriceTable from '../../components/PriceTable.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
 import { getAllUseCases } from '../../lib/data';
 import type { UseCaseData } from '../../lib/types';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../lib/schema';
+import {
+  webPageSchema,
+  breadcrumbSchema,
+  faqPageSchema,
+  serviceSchema,
+} from '../../lib/schema';
 
 export const getStaticPaths = (() => {
   return getAllUseCases().map((uc) => ({
@@ -34,6 +39,7 @@ const breadcrumbs = [
 ];
 
 const schemas = [
+  serviceSchema({ name: `${uc.name} 출장마사지`, description, path }),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(uc.faq ?? []),

@@ -157,6 +157,32 @@ export interface ChecklistItem {
   detail?: string;
 }
 
+/**
+ * 실제 이용자 후기 (src/data/common/reviews.json)
+ * 허위 후기·가짜 평점 금지 정책에 따라, 실제 후기가 입력된 경우에만
+ * Review/AggregateRating 스키마와 화면 노출이 생성된다.
+ */
+export interface Review {
+  author: string; // 후기 작성자 (예: "김OO")
+  rating: number; // 평점 1~5
+  body: string; // 후기 본문
+  date: string; // 작성일 ISO (YYYY-MM-DD)
+  region?: string; // 이용 지역 (예: "서울 강남")
+}
+
+/** reviews.json 루트 구조 */
+export interface ReviewsData {
+  items: Review[];
+}
+
+/** 내부 링크 항목 (롱테일 관련 링크 카드/칩 공통) */
+export interface RelatedLink {
+  name: string; // 앵커 텍스트 (롱테일 권장)
+  href: string; // 내부 경로
+  desc?: string; // 카드 설명
+  badge?: string; // 태그 라벨 (예: "인접 생활권")
+}
+
 /** 가격표 코스 항목 */
 export interface PriceCourse {
   name: string;
