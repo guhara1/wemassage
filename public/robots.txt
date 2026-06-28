@@ -4,4 +4,4 @@ Allow: /
 # 인천 동구는 2026.7.1 제물포구 통합 → noindex
 Disallow: /incheon/dong-gu/
 
-Sitemap: https://we-massage.pages.dev/sitemap-index.xml
+Sitemap: https://wemassage.pages.dev/sitemap-index.xml

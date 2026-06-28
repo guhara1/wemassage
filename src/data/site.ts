@@ -7,12 +7,12 @@ import type { SiteConfig } from '../lib/types';
  * - 상호: WE 마사지
  * - 전화예약: 0508-202-4719
  * - 디스크립션: 80자 이내
- * - 도메인: we-massage.pages.dev
+ * - 도메인: wemassage.pages.dev
  */
 export const siteConfig: SiteConfig = {
   name: 'WE 마사지',
   // astro.config.mjs 의 SITE_URL과 동일하게 유지
-  url: 'https://we-massage.pages.dev',
+  url: 'https://wemassage.pages.dev',
   title: '서울·경기·인천 출장마사지｜수도권 지역·생활권·역세권 홈타이 안내',
   // 80자 이내 메타 디스크립션 (현재 76자)
   description:
@@ -54,7 +54,7 @@ export const siteConfig: SiteConfig = {
   telegramUrl: 'https://t.me/googleseolab',
   organization: {
     name: 'WE 마사지',
-    url: 'https://we-massage.pages.dev',
+    url: 'https://wemassage.pages.dev',
     description:
       '서울·경기·인천 수도권 출장마사지·홈타이 방문 가능 지역과 예약 전 확인사항을 안내합니다.',
   },

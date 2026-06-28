@@ -21,14 +21,14 @@ Cloudflare Pages → Settings → Environment variables에 추가:
 
 | 변수 | 값 | 비고 |
 |---|---|---|
-| `SITE_URL` | `https://we-massage.pages.dev` | sitemap/canonical의 절대 URL용. 미설정 시 astro.config.mjs 기본값 사용 |
+| `SITE_URL` | `https://wemassage.pages.dev` | sitemap/canonical의 절대 URL용. 미설정 시 astro.config.mjs 기본값 사용 |
 
 ## 동작 흐름
 
 1. `git push origin main` → Cloudflare가 자동 감지
 2. `npm install` → Astro + sitemap + sharp 설치
 3. `npm run build` → `dist/` 에 1,655페이지 + sitemap + rss 생성
-4. `dist/` 배포 → `we-massage.pages.dev` 서빙
+4. `dist/` 배포 → `wemassage.pages.dev` 서빙
 
 ## 참고
 
