@@ -1,0 +1,116 @@
+---
+/**
+ * 리뷰 표시 컴포넌트 (UI)
+ * 실제 고객 후기 데이터(reviews.json) 표시.
+ * - 평점 요약 배지 (평균 별점 + 개수)
+ * - 리뷰 카드 그리드
+ */
+import { getReviewsData } from '../lib/data';
+
+interface Props {
+  limit?: number;       // 표시할 리뷰 수 (기본 6)
+  showSummary?: boolean; // 평점 요약 배지 표시
+}
+
+const { limit = 6, showSummary = true } = Astro.props;
+const data = getReviewsData();
+const reviews = data.reviews.slice(0, limit);
+const summary = data.summary;
+
+// 별 렌더링 (채워진/빈)
+function stars(rating: number): string {
+  const full = '★'.repeat(rating);
+  const empty = '☆'.repeat(5 - rating);
+  return full + empty;
+}
+---
+
+<section class="section-sm" style="border-top: 1px solid var(--color-border);">
+  <h2 class="section-title">고객 <span class="accent">후기</span></h2>
+  {showSummary && (
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; padding: 18px 22px; background: var(--color-bg-card); border: 1px solid var(--color-border-accent); border-radius: var(--radius-sm);">
+      <div style="font-size: 2.2rem; color: var(--color-accent-bright); font-weight: 900; line-height: 1;">
+        {summary.averageRating.toFixed(1)}
+      </div>
+      <div>
+        <div style="color: var(--color-accent-bright); font-size: 1.1rem; letter-spacing: 2px;">
+          {'★'.repeat(Math.round(summary.averageRating))}{'☆'.repeat(5 - Math.round(summary.averageRating))}
+        </div>
+        <div style="color: var(--color-text-muted); font-size: 0.85rem; margin-top: 2px;">
+          {summary.totalCount}개 고객 후기 기반
+        </div>
+      </div>
+    </div>
+  )}
+
+  <div class="review-grid">
+    {reviews.map((review) => (
+      <article class="review-card">
+        <div class="review-card__head">
+          <span class="review-card__author">{review.author}</span>
+          <span class="review-card__rating">{stars(review.rating)}</span>
+        </div>
+        <p class="review-card__text">{review.text}</p>
+        <div class="review-card__meta">
+          {review.region && <span class="tag">{review.region}</span>}
+          {review.useType && <span class="tag">{review.useType}</span>}
+          <span class="review-card__date">{review.date}</span>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+.review-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: border-color var(--transition);
+}
+.review-card:hover {
+  border-color: var(--color-border-accent);
+}
+.review-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.review-card__author {
+  font-weight: 700;
+  color: var(--color-text);
+}
+.review-card__rating {
+  color: var(--color-accent-bright);
+  letter-spacing: 2px;
+  font-size: 0.95rem;
+}
+.review-card__text {
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.review-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.review-card__date {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+@media (max-width: 768px) {
+  .review-grid { grid-template-columns: 1fr; }
+}
+</style>

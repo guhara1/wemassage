@@ -199,3 +199,29 @@ export interface BreadcrumbItem {
   name: string;
   url: string;
 }
+
+/** 개별 리뷰 항목 */
+export interface ReviewItem {
+  id: string;
+  rating: number;       // 1~5
+  author: string;       // 작성자 (마스킹)
+  date: string;         // ISO 날짜
+  region?: string;      // 지역 (예: "서울 강남구")
+  useType?: string;     // 이용 유형 (예: "자택 이용")
+  course?: string;      // 코스 (예: "프리미엄 마사지 90분")
+  text: string;         // 후기 원문
+}
+
+/** 리뷰 데이터 (메타 + 리뷰 목록) */
+export interface ReviewsData {
+  _meta?: { source: string; note?: string; lastUpdated: string };
+  summary: {
+    totalCount: number;
+    averageRating: number;
+    rating5Count: number;
+    rating4Count: number;
+    bestRating: number;
+    worstRating: number;
+  };
+  reviews: ReviewItem[];
+}

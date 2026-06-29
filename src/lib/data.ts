@@ -11,6 +11,8 @@ import type {
   UseCaseData,
   ChecklistItem,
   PriceTableData,
+  ReviewsData,
+  ReviewItem,
   Province,
 } from './types';
 import { romanize } from './romanize';
@@ -24,6 +26,7 @@ import gyeonggiCityDistricts from '../data/gyeonggi/city-districts.json';
 import useCasesData from '../data/common/use-cases.json';
 import checklistData from '../data/common/checklists.json';
 import priceTableData from '../data/common/price-table.json';
+import reviewsData from '../data/common/reviews.json';
 
 type LifeAreaMap = Record<Province, LifeArea[]>;
 
@@ -110,6 +113,23 @@ export function getChecklist(): ChecklistItem[] {
 
 export function getPriceTable(): PriceTableData {
   return priceTableData as PriceTableData;
+}
+
+/* === 리뷰 === */
+
+/** 리뷰 전체 데이터 (메타 + 목록) */
+export function getReviewsData(): ReviewsData {
+  return reviewsData as unknown as ReviewsData;
+}
+
+/** 리뷰 목록만 */
+export function getReviews(): ReviewItem[] {
+  return (reviewsData as unknown as ReviewsData).reviews;
+}
+
+/** 리뷰 요약 (평점/개수) */
+export function getReviewSummary() {
+  return (reviewsData as unknown as ReviewsData).summary;
 }
 
 /* === 유틸 === */
@@ -371,3 +391,65 @@ const STATION_LABELS: Record<string, string> = {
 export function stationLabel(slug: string): string {
   return STATION_LABELS[slug] ?? slug.replace(/-/g, ' ');
 }
+
+/* ==========================================================================
+   관련 지역(이웃) 자동 조회 — 내부링크 강화용
+   ========================================================================== */
+
+/**
+ * 같은 광역단체 내 이웃 생활권을 반환 (현재 slug 제외)
+ * nearbyAreas → 부족하면 같은 province의 다른 ready 생활권으로 보충.
+ */
+export function getNearbyLifeAreas(province: Province, currentSlug: string, max = 8): LifeArea[] {
+  const all = getReadyLifeAreas(province);
+  const current = all.find((a) => a.slug === currentSlug);
+  // 1순위: 데이터에 명시된 인접 생활권
+  const nearbySlugs = current?.nearbyAreas ?? [];
+  const nearby = nearbySlugs
+    .map((s) => all.find((a) => a.slug === s))
+    .filter((a): a is LifeArea => !!a && a.slug !== currentSlug);
+  // 2순위: 부족하면 같은 province 다른 생활권으로 보충
+  const result = [...nearby];
+  if (result.length < max) {
+    for (const a of all) {
+      if (result.length >= max) break;
+      if (a.slug === currentSlug) continue;
+      if (result.find((r) => r.slug === a.slug)) continue;
+      result.push(a);
+    }
+  }
+  return result.slice(0, max);
+}
+
+/**
+ * 같은 광역단체 내 이웃 행정구·시군을 반환 (현재 slug 제외)
+ */
+export function getNearbyDistricts(province: Province, currentSlug: string, max = 6): DistrictData[] {
+  const all = getDistricts(province).filter((d) => !d.noindex);
+  return all.filter((d) => d.slug !== currentSlug).slice(0, max);
+}
+
+/** 광역단체별 대표 롱테일 키워드 (내부링크 앵커 다양화용) */
+export const LONGTAIL_KEYWORDS: Record<Province, string[]> = {
+  seoul: [
+    '출장마사지 방문 가능 지역',
+    '홈타이 예약 전 확인사항',
+    '호텔·오피스텔 방문 기준',
+    '역세권 방문 가능 지역',
+    '추가 이동비 안내',
+  ],
+  gyeonggi: [
+    '시·군별 방문 가능 지역',
+    '신도시 출장마사지 기준',
+    '읍면동 방문 안내',
+    '외곽 추가 이동비',
+    '역세권 방문 가능 지역',
+  ],
+  incheon: [
+    '구·군별 방문 가능 지역',
+    '공항·도서 방문 기준',
+    '신도시 출장마사지 안내',
+    '역세권 방문 가능 지역',
+    '추가 이동비 안내',
+  ],
+};

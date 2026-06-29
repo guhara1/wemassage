@@ -8,8 +8,10 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Checklist from '../../components/Checklist.astro';
 import PriceTable from '../../components/PriceTable.astro';
 import PhoneCTA from '../../components/PhoneCTA.astro';
-import { getDistricts, getReadyLifeAreas } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import RelatedAreas from '../../components/RelatedAreas.astro';
+import ReviewList from '../../components/ReviewList.astro';
+import { getDistricts, getReadyLifeAreas, getPriceTable, getReviewsData } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema, serviceSchema, reviewsSchema } from '../../lib/schema';
 
 const path = '/seoul/';
 const title = '서울 출장마사지｜25개 행정구 방문 가능 지역 안내';
@@ -26,6 +28,8 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  serviceSchema(getPriceTable(), ['서울']),
+  reviewsSchema(getReviewsData(), '서울 출장마사지'),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];
@@ -101,6 +105,12 @@ const schemas = [
     <section class="section" style="border-top: 1px solid var(--color-border);">
       <Checklist />
     </section>
+
+    <section class="section" style="border-top: 1px solid var(--color-border);">
+      <ReviewList limit={4} />
+    </section>
+
+    <RelatedAreas province="seoul" currentSlug="seoul" currentName="서울" mode="district" maxDistrict={8} />
 
   </div>
 </BaseLayout>

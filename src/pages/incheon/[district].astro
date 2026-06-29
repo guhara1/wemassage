@@ -12,6 +12,7 @@ import PriceTable from '../../components/PriceTable.astro';
 import PhoneCTA from '../../components/PhoneCTA.astro';
 import FAQ from '../../components/FAQ.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
+import RelatedAreas from '../../components/RelatedAreas.astro';
 import {
   getDistricts,
   findLifeAreaBySlug,
@@ -171,6 +172,8 @@ const dongs = getDongList('incheon', district.slug);
     <ExternalSources links={[
       { label: '인천광역시', url: 'https://www.incheon.go.kr', desc: '인천 행정정보' },
     ]} />
+
+    <RelatedAreas province="incheon" currentSlug={district.slug} currentName={dName} mode="district" maxDistrict={6} maxLife={4} />
 
   </div>
 </BaseLayout>

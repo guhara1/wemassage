@@ -11,6 +11,8 @@ import Checklist from '../../../components/Checklist.astro';
 import PriceTable from '../../../components/PriceTable.astro';
 import PhoneCTA from '../../../components/PhoneCTA.astro';
 import ExternalSources from '../../../components/ExternalSources.astro';
+import RelatedAreas from '../../../components/RelatedAreas.astro';
+import ReviewList from '../../../components/ReviewList.astro';
 import { getReadyLifeAreas, PROVINCE_LABEL } from '../../../lib/data';
 import type { LifeArea, UseCaseSlug } from '../../../lib/types';
 import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
@@ -112,6 +114,10 @@ const UC_LABEL: Record<UseCaseSlug, string> = {
     {area.externalLinks && area.externalLinks.length > 0 && (
       <ExternalSources links={area.externalLinks} />
     )}
+
+    <ReviewList limit={4} />
+
+    <RelatedAreas province="gyeonggi" currentSlug={area.slug} currentName={area.name} mode="life" maxLife={6} />
 
   </div>
 </BaseLayout>

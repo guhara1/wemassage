@@ -7,14 +7,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Checklist from '../components/Checklist.astro';
 import PriceTable from '../components/PriceTable.astro';
 import PhoneCTA from '../components/PhoneCTA.astro';
+import ReviewList from '../components/ReviewList.astro';
 import { siteConfig } from '../data/site';
-import { getReadyLifeAreas, getAllUseCases } from '../lib/data';
+import { getReadyLifeAreas, getAllUseCases, getPriceTable, getReviewsData } from '../lib/data';
 import {
   webPageSchema,
   breadcrumbSchema,
   organizationSchema,
   webSiteSchema,
   imageObjectSchema,
+  serviceSchema,
+  reviewsSchema,
 } from '../lib/schema';
 
 const path = '/';
@@ -36,6 +39,8 @@ const breadcrumbs = [
 const schemas = [
   organizationSchema(),
   webSiteSchema(),
+  serviceSchema(getPriceTable()),
+  reviewsSchema(getReviewsData()),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   imageObjectSchema('/og-image.webp'),
@@ -275,6 +280,13 @@ const schemas = [
     {/* === Section 5. 예약 전 체크리스트 === */}
     <section class="section">
       <Checklist />
+    </section>
+
+    <hr class="divider" />
+
+    {/* === Section 5b. 고객 후기 === */}
+    <section class="section">
+      <ReviewList limit={6} />
     </section>
 
     <hr class="divider" />

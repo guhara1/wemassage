@@ -11,7 +11,7 @@
  *
  * 주의: 오프라인 매장이 없는 방문형 사이트이므로 LocalBusiness Schema는 사용하지 않는다.
  */
-import type { FAQItem, BreadcrumbItem } from './types';
+import type { FAQItem, BreadcrumbItem, PriceTableData, ReviewItem, ReviewsData } from './types';
 import { siteConfig } from '../data/site';
 
 /** 사이트 절대 URL 생성 */
@@ -156,4 +156,112 @@ export function webSiteSchema() {
 /** 여러 스키마 결합 (null 제거) */
 export function buildSchemaGraph(schemas: object[]): object[] {
   return schemas.filter(Boolean);
+}
+
+/**
+ * Offer 스키마 — 실제 가격 정보 (구글 정책 준수: 실제 데이터만)
+ * Review/AggregateRating(가짜 점수·후기)는 구글 스팸 정책 위반으로 사용하지 않음.
+ */
+export function offerSchema(
+  courseName: string,
+  price: string,
+  description?: string
+) {
+  // "100,000원" → 숫자 추출
+  const priceNum = parseInt(price.replace(/[^0-9]/g, ''), 10);
+  return {
+    '@type': 'Offer',
+    name: courseName,
+    description: description || courseName,
+    price: isNaN(priceNum) ? price : String(priceNum),
+    priceCurrency: 'KRW',
+    availability: 'https://schema.org/InStock',
+  };
+}
+
+/**
+ * Service 스키마 — 출장 마사지 서비스 정보
+ * 가격표(Offer 목록)를 포함하여 서비스 범위 명시.
+ */
+export function serviceSchema(priceData?: PriceTableData, areaServed?: string[]) {
+  const offers = priceData?.courses?.map((c) => offerSchema(c.name, c.price, c.desc)) ?? [];
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: '수도권 출장마사지',
+    serviceType: '방문 마사지 서비스',
+    provider: {
+      '@type': 'Organization',
+      name: siteConfig.organization.name,
+      url: siteConfig.organization.url,
+    },
+    areaServed: (areaServed ?? ['서울', '경기', '인천']).map((a) => ({
+      '@type': 'AdministrativeArea',
+      name: a,
+    })),
+    description: siteConfig.organization.description,
+    ...(offers.length > 0
+      ? {
+          offers: {
+            '@type': 'AggregateOffer',
+            lowPrice: priceData?.courses?.[0]?.price ?? '',
+            highPrice: priceData?.courses?.[priceData.courses.length - 1]?.price ?? '',
+            priceCurrency: 'KRW',
+            offerCount: offers.length,
+          },
+        }
+      : {}),
+  };
+}
+
+/**
+ * AggregateRating 스키마 — 실제 수집된 리뷰 기반 평점
+ * (구글 정책: 가짜가 아닌 실제 데이터만 사용)
+ */
+export function aggregateRatingSchema(reviews: ReviewsData) {
+  const s = reviews.summary;
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: s.averageRating,
+    reviewCount: s.totalCount,
+    bestRating: s.bestRating,
+    worstRating: s.worstRating,
+  };
+}
+
+/**
+ * Review 스키마 — 개별 리뷰 (실제 고객 후기)
+ */
+export function reviewSchema(review: ReviewItem) {
+  return {
+    '@type': 'Review',
+    author: {
+      '@type': 'Person',
+      name: review.author,
+    },
+    datePublished: review.date,
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: review.rating,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    reviewBody: review.text,
+    ...(review.region ? { areaServed: review.region } : {}),
+  };
+}
+
+/**
+ * ReviewList + AggregateRating 결합 스키마 (Product로 평점 노출)
+ * 메인/허브 페이지에서 검색결과 별표 노출에 사용.
+ */
+export function reviewsSchema(reviews: ReviewsData, itemName?: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: itemName || `${siteConfig.name} 수도권 출장마사지`,
+    description: siteConfig.organization.description,
+    aggregateRating: aggregateRatingSchema(reviews),
+    review: reviews.reviews.slice(0, 20).map((r) => reviewSchema(r)),
+  };
 }

@@ -11,6 +11,7 @@ import PriceTable from '../../components/PriceTable.astro';
 import PhoneCTA from '../../components/PhoneCTA.astro';
 import FAQ from '../../components/FAQ.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
+import RelatedAreas from '../../components/RelatedAreas.astro';
 import {
   getDistricts,
   findLifeAreaBySlug,
@@ -152,6 +153,8 @@ const dongs = getDongList('seoul', district.slug);
     <ExternalSources links={[
       { label: '서울특별시', url: 'https://www.seoul.go.kr', desc: '서울 행정정보' },
     ]} />
+
+    <RelatedAreas province="seoul" currentSlug={district.slug} currentName={dName} mode="district" maxDistrict={6} maxLife={4} />
 
   </div>
 </BaseLayout>

@@ -1,0 +1,109 @@
+---
+/**
+ * 관련 지역 자동 연결 컴포넌트 (내부링크 강화)
+ *
+ * 같은 광역단체 내 인접 생활권·행정구를 롱테일 키워드 앵커와 함께 자동 연결.
+ * - 생활권 페이지: 같은 province의 이웃 생활권
+ * - 행정구·시군 페이지: 같은 province의 이웃 행정구 + 대표 생활권
+ * 모든 링크는 자연스러운 롱테일 앵커 텍스트 사용 (SEO).
+ */
+import type { Province } from '../lib/types';
+import {
+  getNearbyLifeAreas,
+  getNearbyDistricts,
+  getReadyLifeAreas,
+  PROVINCE_LABEL,
+  LONGTAIL_KEYWORDS,
+} from '../lib/data';
+
+interface Props {
+  province: Province;
+  currentSlug: string;     // 현재 페이지의 slug (제외용)
+  currentName: string;     // 현재 페이지 표시명 (헤더용)
+  mode?: 'life' | 'district'; // 생활권 페이지인지 행정구 페이지인지
+  maxLife?: number;
+  maxDistrict?: number;
+}
+
+const {
+  province,
+  currentSlug,
+  currentName,
+  mode = 'district',
+  maxLife = 8,
+  maxDistrict = 6,
+} = Astro.props;
+
+const provLabel = PROVINCE_LABEL[province];
+const longtail = LONGTAIL_KEYWORDS[province];
+
+let lifeAreas = getNearbyLifeAreas(province, currentSlug, maxLife);
+let districts = getNearbyDistricts(province, currentName, maxDistrict);
+
+// 행정구 페이지 모드: 현재 행정구와 다른 행정구 + 대표 생활권
+if (mode === 'district') {
+  // 현재 행정구명과 겹치지 않는 이웃 행정구
+  districts = districts.filter((d) => d.name !== currentName);
+}
+
+// 생활권 페이지 모드: 행정구는 표시하지 않음
+if (mode === 'life') {
+  districts = [];
+}
+
+// 롱테일 앵커 생성 헬퍼
+function lifeAnchor(area: { name: string }, idx: number): string {
+  const kw = longtail[idx % longtail.length];
+  return `${provLabel} ${area.name} ${kw}`;
+}
+function districtAnchor(dist: { name: string }, idx: number): string {
+  return `${dist.name} 출장마사지 방문 가능 지역`;
+}
+---
+
+{(lifeAreas.length > 0 || districts.length > 0) && (
+  <section class="section-sm" style="border-top: 1px solid var(--color-border);">
+    <h2 class="section-title">관련 <span class="accent">지역</span> 보기</h2>
+    <p class="section-subtitle">
+      {provLabel} 다른 지역의 {currentName}과(와) 유사한 방문 환경을 확인하세요.
+    </p>
+
+    {lifeAreas.length > 0 && (
+      <div style="margin-bottom: 32px;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; color: var(--color-text);">
+          {provLabel} 핵심 생활권
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {lifeAreas.map((area, idx) => (
+            <a
+              href={`/${province}/life/${area.slug}/`}
+              style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-sm); transition: all var(--transition); text-decoration: none;"
+            >
+              <span class="tag tag-accent" style="flex-shrink: 0;">생활권</span>
+              <span style="color: var(--color-text); font-weight: 600;">{lifeAnchor(area, idx)}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {districts.length > 0 && (
+      <div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; color: var(--color-text);">
+          {provLabel} 다른 행정구·시군
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {districts.map((dist, idx) => (
+            <a
+              href={`/${province}/${dist.slug}/`}
+              style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-sm); transition: all var(--transition); text-decoration: none;"
+            >
+              <span class="tag" style="flex-shrink: 0;">지역</span>
+              <span style="color: var(--color-text); font-weight: 600;">{districtAnchor(dist, idx)}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
+)}
