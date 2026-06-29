@@ -5,8 +5,8 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { getAllUseCases } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import { getAllUseCases, getReviewsData } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema, reviewsSchema } from '../../lib/schema';
 
 const path = '/use/';
 const title = '수도권 출장마사지 이용 장소별 안내｜자택·호텔·오피스텔·외곽';
@@ -20,6 +20,7 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  reviewsSchema(getReviewsData(), '수도권 출장마사지 이용 장소별 안내'),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];

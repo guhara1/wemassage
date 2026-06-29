@@ -7,7 +7,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import { getReviewsData } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema, reviewsSchema } from '../../lib/schema';
 
 const path = '/station/';
 const title = '수도권 출장마사지 지하철역 보기｜강남역·수원역·부평역 역세권';
@@ -21,6 +22,7 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  reviewsSchema(getReviewsData(), '수도권 역세권 출장마사지'),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];

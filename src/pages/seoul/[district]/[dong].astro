@@ -16,8 +16,9 @@ import {
   getDongList,
   getAllUseCases,
   postposition,
+  getReviewsData,
 } from '../../../lib/data';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import { webPageSchema, breadcrumbSchema, faqPageSchema, reviewsSchema } from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
   const districts = ['gangnam-gu','seocho-gu','songpa-gu','gangdong-gu','mapo-gu','seodaemun-gu','eunpyeong-gu','yeongdeungpo-gu','guro-gu','geumcheon-gu','gangseo-gu','yangcheon-gu','gwanak-gu','dongjak-gu','seongdong-gu','gwangjin-gu','dongdaemun-gu','jungnang-gu','nowon-gu','dobong-gu','gangbuk-gu','seongbuk-gu','jongno-gu','jung-gu','yongsan-gu'];
@@ -66,6 +67,7 @@ const faqs = [
 ];
 
 const schemas = [
+  reviewsSchema(getReviewsData(), `서울 ${districtName} ${dongName} 출장마사지`),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(faqs),

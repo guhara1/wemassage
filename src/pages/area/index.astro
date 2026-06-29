@@ -5,8 +5,8 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { getDistricts, getReadyLifeAreas } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import { getDistricts, getReadyLifeAreas, getReviewsData } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema, reviewsSchema } from '../../lib/schema';
 
 const path = '/area/';
 const title = '수도권 출장마사지 지역별 보기｜서울·경기·인천 전체 안내';
@@ -20,6 +20,7 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  reviewsSchema(getReviewsData(), '수도권 출장마사지 지역별 보기'),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];

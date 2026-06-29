@@ -5,8 +5,8 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { getReadyLifeAreas } from '../../lib/data';
-import { breadcrumbSchema, webPageSchema, organizationSchema } from '../../lib/schema';
+import { getReadyLifeAreas, getReviewsData } from '../../lib/data';
+import { breadcrumbSchema, webPageSchema, organizationSchema, reviewsSchema } from '../../lib/schema';
 
 const path = '/life/';
 const title = '수도권 출장마사지 생활권 보기｜업무지구·신도시·역세권·주거';
@@ -20,6 +20,7 @@ const breadcrumbs = [
 
 const schemas = [
   organizationSchema(),
+  reviewsSchema(getReviewsData(), '수도권 생활권 출장마사지'),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
 ];

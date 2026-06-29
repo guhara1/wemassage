@@ -10,9 +10,9 @@ import FAQ from '../../components/FAQ.astro';
 import Checklist from '../../components/Checklist.astro';
 import PriceTable from '../../components/PriceTable.astro';
 import ExternalSources from '../../components/ExternalSources.astro';
-import { getAllUseCases } from '../../lib/data';
+import { getAllUseCases, getReviewsData } from '../../lib/data';
 import type { UseCaseData } from '../../lib/types';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../lib/schema';
+import { webPageSchema, breadcrumbSchema, faqPageSchema, reviewsSchema } from '../../lib/schema';
 
 export const getStaticPaths = (() => {
   return getAllUseCases().map((uc) => ({
@@ -34,6 +34,7 @@ const breadcrumbs = [
 ];
 
 const schemas = [
+  reviewsSchema(getReviewsData(), uc.name),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(uc.faq ?? []),

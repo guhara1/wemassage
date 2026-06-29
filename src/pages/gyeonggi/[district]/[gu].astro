@@ -16,8 +16,9 @@ import {
   getGuDistricts,
   getDongListByGu,
   getAllUseCases,
+  getReviewsData,
 } from '../../../lib/data';
-import { webPageSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import { webPageSchema, breadcrumbSchema, faqPageSchema, reviewsSchema } from '../../../lib/schema';
 
 export const getStaticPaths = (() => {
   // citySlug → 한국어 시 이름 매핑
@@ -75,6 +76,7 @@ const faqs = [
 ];
 
 const schemas = [
+  reviewsSchema(getReviewsData(), `${cityName} ${guName} 출장마사지`),
   breadcrumbSchema(breadcrumbs),
   webPageSchema(path, title, description, breadcrumbs),
   faqPageSchema(faqs),
